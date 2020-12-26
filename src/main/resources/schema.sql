@@ -13,7 +13,7 @@ CREATE TABLE users
 (
     id         INTEGER   DEFAULT nextval('global_seq') PRIMARY KEY,
     name       VARCHAR                 NOT NULL,
-    email      VARCHAR                 NOT NULL,
+    email      VARCHAR UNIQUE          NOT NULL,
     password   VARCHAR                 NOT NULL,
     enabled    BOOL      DEFAULT TRUE  NOT NULL,
     registered TIMESTAMP DEFAULT now() NOT NULL
