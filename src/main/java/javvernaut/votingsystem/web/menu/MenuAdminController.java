@@ -33,6 +33,7 @@ public class MenuAdminController {
 
     @GetMapping
     public List<Menu> getAll(@PathVariable int restaurantId) {
+        log.info("get all");
         return menuRepository.findAllByRestaurantId(restaurantId);
     }
 
@@ -76,7 +77,7 @@ public class MenuAdminController {
 
     private void checkDateIsAfterTheCurrent(LocalDate date) {
         if (!date.isAfter(CURRENT_DATE)) {
-            throw new IllegalRequestDataException("date must be greater the current");
+            throw new IllegalRequestDataException("New date must be greater the current");
         }
     }
 }

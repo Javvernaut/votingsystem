@@ -2,6 +2,8 @@ package javvernaut.votingsystem.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,17 +19,14 @@ public class Dish extends AbstractNamedEntity {
     @NotNull
     private Integer price;
 
-    @Column(name = "active", nullable = false, columnDefinition = "bool default true")
-    private boolean active;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
-    @NotNull
     private Restaurant restaurant;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "menu_dishes",
             joinColumns = @JoinColumn(name = "dish_id"),
             inverseJoinColumns = @JoinColumn(name = "menu_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Menu> menus;
 }

@@ -2,6 +2,7 @@ package javvernaut.votingsystem.web.user;
 
 import javvernaut.votingsystem.model.User;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class AdminController extends AbstractUserController {
     @GetMapping
     public List<User> getAll() {
         log.info("get all");
-        return repository.findAll();
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "name", "email"));
     }
 
     @GetMapping("/{id}")

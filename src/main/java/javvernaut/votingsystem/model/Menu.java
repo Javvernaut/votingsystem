@@ -2,6 +2,8 @@ package javvernaut.votingsystem.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -26,5 +28,6 @@ public class Menu extends AbstractBaseEntity {
     @JoinTable(name = "menu_dishes",
             joinColumns = @JoinColumn(name = "menu_id"),
             inverseJoinColumns = @JoinColumn(name = "dish_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Dish> dishes;
 }

@@ -1,18 +1,22 @@
 package javvernaut.votingsystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javvernaut.votingsystem.HasId;
 import lombok.*;
-import org.hibernate.Hibernate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.util.ProxyUtils;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 
 @MappedSuperclass
 @Access(AccessType.FIELD)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
-public abstract class AbstractBaseEntity implements HasId {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
+public abstract class AbstractBaseEntity implements Persistable<Integer>, HasId {
     public static final int START_SEQ = 100000;
 
     @Id
@@ -20,9 +24,16 @@ public abstract class AbstractBaseEntity implements HasId {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "global_seq")
     protected Integer id;
 
+    // doesn't work for hibernate lazy proxy
+    public int id() {
+        Assert.notNull(id, "Entity must have id");
+        return id;
+    }
+
+    @JsonIgnore
     @Override
-    public String toString() {
-        return getClass().getSimpleName() + ":" + id;
+    public boolean isNew() {
+        return id == null;
     }
 
     @Override
@@ -30,7 +41,7 @@ public abstract class AbstractBaseEntity implements HasId {
         if (this == o) {
             return true;
         }
-        if (o == null || !getClass().equals(Hibernate.getClass(o))) {
+        if (o == null || !getClass().equals(ProxyUtils.getUserClass(o))) {
             return false;
         }
         AbstractBaseEntity that = (AbstractBaseEntity) o;

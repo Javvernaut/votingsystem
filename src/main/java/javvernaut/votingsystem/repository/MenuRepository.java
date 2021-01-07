@@ -3,6 +3,7 @@ package javvernaut.votingsystem.repository;
 import javvernaut.votingsystem.model.Dish;
 import javvernaut.votingsystem.model.Menu;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,5 +29,7 @@ public interface MenuRepository extends BaseRepository<Menu> {
     @Query("SELECT m.dishes FROM Menu m WHERE m.restaurant.id=:restaurantId")
     List<Dish> findClosestMenu(int restaurantId);
 
+    @Transactional
+    @Modifying
     void deleteByIdAndRestaurantId(int id, int restaurantId);
 }
