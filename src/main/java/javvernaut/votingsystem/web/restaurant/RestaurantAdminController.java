@@ -1,7 +1,7 @@
 package javvernaut.votingsystem.web.restaurant;
 
 import javvernaut.votingsystem.model.Restaurant;
-import javvernaut.votingsystem.repository.jpa.RestaurantRepository;
+import javvernaut.votingsystem.repository.RestaurantRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -51,7 +51,7 @@ public class RestaurantAdminController {
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void update(@Valid @RequestBody Restaurant restaurant, @PathVariable int id) {
         log.info("update {}", restaurant);
         assureIdConsistent(restaurant, id);

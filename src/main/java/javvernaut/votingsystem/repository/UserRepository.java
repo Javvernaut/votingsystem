@@ -1,4 +1,4 @@
-package javvernaut.votingsystem.repository.jpa;
+package javvernaut.votingsystem.repository;
 
 import javvernaut.votingsystem.model.User;
 import org.springframework.data.jpa.repository.Modifying;

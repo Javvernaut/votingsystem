@@ -2,8 +2,8 @@ package javvernaut.votingsystem.web.restaurant;
 
 import javvernaut.votingsystem.model.Dish;
 import javvernaut.votingsystem.model.Restaurant;
-import javvernaut.votingsystem.repository.jpa.MenuRepository;
-import javvernaut.votingsystem.repository.jpa.RestaurantRepository;
+import javvernaut.votingsystem.repository.MenuRepository;
+import javvernaut.votingsystem.repository.RestaurantRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;

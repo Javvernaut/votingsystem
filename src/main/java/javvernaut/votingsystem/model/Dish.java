@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Setter
 @Getter
-@Table(name = "dishes", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "restaurant_id"}, name = "dishes_unique_name_restaurant_idx")})
+@Table(name = "dishes", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "restaurant_id"}, name = "dishes_unique_name_restaurant_idx"))
 public class Dish extends AbstractNamedEntity {
 
     @Column(name = "price", nullable = false)
@@ -25,6 +25,9 @@ public class Dish extends AbstractNamedEntity {
     @NotNull
     private Restaurant restaurant;
 
-    @ManyToMany(mappedBy = "dishes")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "menu_dishes",
+            joinColumns = @JoinColumn(name = "dish_id"),
+            inverseJoinColumns = @JoinColumn(name = "menu_id"))
     private List<Menu> menus;
 }

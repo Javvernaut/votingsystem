@@ -1,4 +1,4 @@
-package javvernaut.votingsystem.repository.jpa;
+package javvernaut.votingsystem.repository;
 
 import javvernaut.votingsystem.model.Restaurant;
 import org.springframework.data.jpa.repository.Modifying;

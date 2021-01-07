@@ -2,9 +2,10 @@ package javvernaut.votingsystem.web;
 
 import javvernaut.votingsystem.model.Dish;
 import javvernaut.votingsystem.model.Menu;
-import javvernaut.votingsystem.repository.jpa.DishRepository;
-import javvernaut.votingsystem.repository.jpa.MenuRepository;
+import javvernaut.votingsystem.repository.DishRepository;
+import javvernaut.votingsystem.repository.MenuRepository;
 import org.springframework.context.ApplicationContext;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,11 +33,6 @@ public class RootController {
         return menuRepository.findAll();
     }
 
-    @GetMapping("/restaurants")
-    public List<Menu> getMenusWithReataurants() {
-        return menuRepository.getWithRestaurants();
-    }
-
     @GetMapping("/dish")
     public Dish getDish() {
         return dishRepository.findByIdAndRestaurantId(100007, 100002).orElseThrow();
@@ -45,5 +41,11 @@ public class RootController {
     @GetMapping("/beans")
     public List<String> getBeans() {
         return Arrays.asList(applicationContext.getBeanDefinitionNames());
+    }
+
+    @DeleteMapping
+    public void delete() {
+        //menuRepository.deleteById(100017);
+        dishRepository.deleteById(100009);
     }
 }

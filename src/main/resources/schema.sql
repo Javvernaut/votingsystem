@@ -23,10 +23,9 @@ CREATE TABLE users
 CREATE TABLE restaurants
 (
     id     INTEGER DEFAULT nextval('global_seq') PRIMARY KEY,
-    name   VARCHAR              NOT NULL,
+    name   VARCHAR UNIQUE       NOT NULL,
     active BOOL    DEFAULT TRUE NOT NULL
 );
-CREATE UNIQUE INDEX restaurants_unique_name_idx ON restaurants (name);
 
 CREATE TABLE user_roles
 (
@@ -43,16 +42,17 @@ CREATE TABLE dishes
     price         INTEGER              NOT NULL,
     active        BOOL    DEFAULT TRUE NOT NULL,
     restaurant_id INTEGER              NOT NULL,
-    FOREIGN KEY (restaurant_id) REFERENCES restaurants (id) ON DELETE CASCADE
+    FOREIGN KEY (restaurant_id) REFERENCES restaurants (id) ON DELETE CASCADE,
+    CONSTRAINT dishes_unique_name_restaurant_idx UNIQUE (name, restaurant_id)
 );
-CREATE UNIQUE INDEX dishes_unique_name_restaurant_idx ON dishes (name, restaurant_id);
 
 CREATE TABLE menus
 (
     id            INTEGER   DEFAULT nextval('global_seq') PRIMARY KEY,
     date          TIMESTAMP DEFAULT now() NOT NULL,
     restaurant_id INTEGER                 NOT NULL,
-    FOREIGN KEY (restaurant_id) REFERENCES restaurants (id) ON DELETE CASCADE
+    FOREIGN KEY (restaurant_id) REFERENCES restaurants (id) ON DELETE CASCADE,
+    CONSTRAINT menus_unique_date_restaurant_idx UNIQUE (date, restaurant_id)
 );
 
 CREATE TABLE menu_dishes
@@ -60,6 +60,6 @@ CREATE TABLE menu_dishes
     menu_id INTEGER NOT NULL,
     dish_id INTEGER NOT NULL,
     FOREIGN KEY (menu_id) REFERENCES menus (id) ON DELETE CASCADE,
-    FOREIGN KEY (dish_id) REFERENCES dishes (id),
+    FOREIGN KEY (dish_id) REFERENCES dishes (id) ON DELETE CASCADE,
     CONSTRAINT menu_dishes_idx UNIQUE (menu_id, dish_id)
 )

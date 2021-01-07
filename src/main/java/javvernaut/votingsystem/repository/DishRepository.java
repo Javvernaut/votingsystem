@@ -1,4 +1,4 @@
-package javvernaut.votingsystem.repository.jpa;
+package javvernaut.votingsystem.repository;
 
 import javvernaut.votingsystem.model.Dish;
 import org.springframework.transaction.annotation.Transactional;

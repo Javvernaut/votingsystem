@@ -8,8 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDate;
+
 @Configuration
 public class AppConfig {
+    public static final LocalDate CURRENT_DATE = LocalDate.now();
+
     @Bean
     public Module hibernate5Module() {
         return new Hibernate5Module();

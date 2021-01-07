@@ -1,6 +1,6 @@
 package javvernaut.votingsystem.config;
 
-import javvernaut.votingsystem.repository.jpa.UserRepository;
+import javvernaut.votingsystem.repository.UserRepository;
 import javvernaut.votingsystem.util.security.AuthorizedUser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/profile/register").anonymous()
+                .antMatchers("/restaurants/**").anonymous()
                 .antMatchers("/menus").hasRole("USER")
                 .antMatchers("/menus/dish").hasRole("ADMIN")
                 .antMatchers("/**").authenticated()

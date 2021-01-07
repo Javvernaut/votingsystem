@@ -2,7 +2,7 @@ package javvernaut.votingsystem.web.user;
 
 import javvernaut.votingsystem.HasId;
 import javvernaut.votingsystem.model.User;
-import javvernaut.votingsystem.repository.jpa.UserRepository;
+import javvernaut.votingsystem.repository.UserRepository;
 import javvernaut.votingsystem.util.UserUtil;
 import javvernaut.votingsystem.util.ValidationUtil;
 import lombok.extern.slf4j.Slf4j;
