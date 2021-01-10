@@ -12,7 +12,12 @@ import java.time.LocalDate;
 
 @Configuration
 public class AppConfig {
-    public static final LocalDate CURRENT_DATE = LocalDate.now();
+    public static final LocalDate CURRENT_DATE = LocalDate.parse("2020-12-11");
+
+/*    @Bean
+    public HttpTraceRepository httpTraceRepository() {
+        return new InMemoryHttpTraceRepository();
+    }*/
 
     @Bean
     public Module hibernate5Module() {

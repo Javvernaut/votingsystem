@@ -1,9 +1,6 @@
 package javvernaut.votingsystem.model;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -12,10 +9,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "restaurants")
+@AttributeOverride(name = "name", column = @Column(name = "name", nullable = false, unique = true))
 @Setter
 @Getter
-@AttributeOverride(name = "name", column = @Column(name = "name", nullable = false, unique = true))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(callSuper = true, exclude = {"menus", "dishes", "votes"})
 public class Restaurant extends AbstractNamedEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")

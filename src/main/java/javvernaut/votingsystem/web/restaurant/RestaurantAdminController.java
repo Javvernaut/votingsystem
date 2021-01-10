@@ -20,10 +20,10 @@ import static javvernaut.votingsystem.util.ValidationUtil.checkNew;
 @RestController
 @Slf4j
 @AllArgsConstructor
-@RequestMapping(value = RestaurantAdminController.RESTAURANT_URL, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = RestaurantAdminController.ADMIN_RESTAURANTS_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class RestaurantAdminController {
 
-    public static final String RESTAURANT_URL = "admin/restaurants";
+    public static final String ADMIN_RESTAURANTS_URL = "admin/restaurants";
     private final RestaurantRepository repository;
 
     @GetMapping
@@ -45,7 +45,7 @@ public class RestaurantAdminController {
         checkNew(restaurant);
         Restaurant created = repository.save(restaurant);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(RESTAURANT_URL + "/{id}")
+                .path(ADMIN_RESTAURANTS_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }

@@ -26,10 +26,9 @@ public interface MenuRepository extends BaseRepository<Menu> {
     @Query("SELECT m FROM Menu m WHERE m.id=:id AND m.restaurant.id=:restaurantId")
     Optional<Menu> findByIdAndRestaurantId(int id, int restaurantId);
 
-    @Query("SELECT m.dishes FROM Menu m WHERE m.restaurant.id=:restaurantId")
-    List<Dish> findClosestMenu(int restaurantId);
-
     @Transactional
     @Modifying
     void deleteByIdAndRestaurantId(int id, int restaurantId);
+
+    Menu getOneByIdAndRestaurantId(int id, int restaurantId);
 }

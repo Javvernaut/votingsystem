@@ -1,9 +1,9 @@
 package javvernaut.votingsystem.web.menu;
 
 import javvernaut.votingsystem.model.Menu;
+import javvernaut.votingsystem.repository.DishRepository;
 import javvernaut.votingsystem.repository.MenuRepository;
 import javvernaut.votingsystem.repository.RestaurantRepository;
-import javvernaut.votingsystem.util.exception.IllegalRequestDataException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,21 +15,21 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
 
-import static javvernaut.votingsystem.config.AppConfig.CURRENT_DATE;
-import static javvernaut.votingsystem.util.ValidationUtil.checkNew;
+import static javvernaut.votingsystem.util.DateUtil.checkDateIsAfterTheCurrent;
+import static javvernaut.votingsystem.util.ValidationUtil.*;
 
 @RestController
 @Slf4j
 @AllArgsConstructor
-@RequestMapping(value = MenuAdminController.MENU_URL, produces = MediaType.APPLICATION_JSON_VALUE)
-public class MenuAdminController {
+@RequestMapping(value = MenuController.MENUS_URL, produces = MediaType.APPLICATION_JSON_VALUE)
+public class MenuController {
 
-    public static final String MENU_URL = "/admin/restaurants/{restaurantId}/menus";
+    public static final String MENUS_URL = "/admin/restaurants/{restaurantId}/menus";
     private final MenuRepository menuRepository;
     private final RestaurantRepository restaurantRepository;
+    private final DishRepository dishRepository;
 
     @GetMapping
     public List<Menu> getAll(@PathVariable int restaurantId) {
@@ -39,6 +39,7 @@ public class MenuAdminController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Menu> get(@PathVariable int restaurantId, @PathVariable int id) {
+        log.info("get {}", id);
         return ResponseEntity.of(menuRepository.findByIdAndRestaurantId(id, restaurantId));
     }
 
@@ -47,37 +48,36 @@ public class MenuAdminController {
     public ResponseEntity<Menu> createWithLocation(@PathVariable int restaurantId, @Valid @RequestBody Menu menu) {
         log.info("create {}", menu);
         checkNew(menu);
-        checkDateIsAfterTheCurrent(menu.getDate());
+        checkDateIsAfterTheCurrent(menu.getDate(), "New date must be greater the current");
         menu.setRestaurant(restaurantRepository.getOne(restaurantId));
         Menu created = menuRepository.save(menu);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(MENU_URL + "/{id}")
+                .path(MENUS_URL + "/{id}")
                 .buildAndExpand(created.getRestaurant().getId(), created.getId()).toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
-    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
-    public void changeDate(@PathVariable int restaurantId, @PathVariable int id, @RequestBody LocalDate date) {
-        log.info("change date of menu={} to {}", id, date);
-        Menu existed = menuRepository.findByIdAndRestaurantId(id, restaurantId).orElseThrow();
-        if (existed.getDate().isBefore(CURRENT_DATE.plusDays(1)))
-            throw new IllegalRequestDataException("Date cannot be changed");
-        checkDateIsAfterTheCurrent(date);
-        existed.setDate(date);
+    public void update(@PathVariable int restaurantId, @PathVariable int id, @Valid @RequestBody Menu menu) {
+        log.info("change date of menu={}", id);
+        assureIdConsistent(menu, id);
+        Menu existed = checkNotFoundWithId(menuRepository.findByIdAndRestaurantId(id, restaurantId),
+                "Menu id=" + id + " doesn't belong to restaurant id=" + restaurantId);
+        checkDateIsAfterTheCurrent(existed.getDate(), "Date cannot be changed");
+        checkDateIsAfterTheCurrent(menu.getDate(), "New date must be greater the current");
+        menu.setRestaurant(restaurantRepository.getOne(restaurantId));
+        menuRepository.save(menu);
     }
 
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     public void delete(@PathVariable int restaurantId, @PathVariable int id) {
         log.info("delete {}", id);
-        menuRepository.deleteByIdAndRestaurantId(id, restaurantId);
-    }
-
-    private void checkDateIsAfterTheCurrent(LocalDate date) {
-        if (!date.isAfter(CURRENT_DATE)) {
-            throw new IllegalRequestDataException("New date must be greater the current");
-        }
+        Menu menu = checkNotFoundWithId(menuRepository.findByIdAndRestaurantId(id, restaurantId), id);
+        checkDateIsAfterTheCurrent(menu.getDate(), "Menu cannot be removed");
+        menuRepository.delete(menu);
     }
 }

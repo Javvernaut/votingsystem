@@ -2,7 +2,9 @@ package javvernaut.votingsystem.to;
 
 
 import javvernaut.votingsystem.HasId;
+import lombok.ToString;
 
+@ToString
 public abstract class BaseTo implements HasId {
 
     public BaseTo() {

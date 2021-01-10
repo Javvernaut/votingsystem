@@ -1,15 +1,3 @@
-DELETE
-FROM user_roles;
-DELETE
-FROM menu_dishes;
-DELETE
-FROM users;
-DELETE
-FROM menus;
-DELETE
-FROM dishes;
-DELETE
-FROM restaurants;
 ALTER SEQUENCE global_seq RESTART WITH 100000;
 
 INSERT INTO users (id, name, email, password)
@@ -25,16 +13,16 @@ INSERT INTO RESTAURANTS(id, name)
 VALUES (global_seq.nextval, 'McDonalds'),
        (global_seq.nextval, 'Burger King');
 
-INSERT INTO dishes(id, name, price, restaurant_id)
-VALUES (global_seq.nextval, 'Chicken', 253, 100002),
-       (global_seq.nextval, 'Soup', 400, 100002),
-       (global_seq.nextval, 'Turkey in pita', 350, 100002),
-       (global_seq.nextval, 'Borscht', 333, 100002),
-       (global_seq.nextval, 'Juice', 333, 100002),
-       (global_seq.nextval, 'Pizza', 333, 100003),
-       (global_seq.nextval, 'Beer', 333, 100003),
-       (global_seq.nextval, 'BlackJack', 333, 100003),
-       (global_seq.nextval, 'Courtesans', 333, 100003);
+INSERT INTO dishes(id, name, restaurant_id)
+VALUES (global_seq.nextval, 'Chicken', 100002),
+       (global_seq.nextval, 'Soup', 100002),
+       (global_seq.nextval, 'Turkey in pita', 100002),
+       (global_seq.nextval, 'Borscht', 100002),
+       (global_seq.nextval, 'Juice', 100002),
+       (global_seq.nextval, 'Pizza', 100003),
+       (global_seq.nextval, 'Beer', 100003),
+       (global_seq.nextval, 'BlackJack', 100003),
+       (global_seq.nextval, 'Courtesans', 100003);
 
 INSERT INTO menus(id, date, restaurant_id)
 VALUES (global_seq.nextval, '2020-12-10 00:00:00', 100002),
@@ -44,20 +32,20 @@ VALUES (global_seq.nextval, '2020-12-10 00:00:00', 100002),
        (global_seq.nextval, '2020-12-11 00:00:00', 100003),
        (global_seq.nextval, '2020-12-12 00:00:00', 100003);
 
-INSERT INTO menu_dishes(menu_id, dish_id)
-VALUES (100013, 100008),
-       (100013, 100006),
-       (100013, 100005),
-       (100014, 100004),
-       (100014, 100005),
-       (100014, 100007),
-       (100015, 100004),
-       (100015, 100005),
-       (100015, 100006),
-       (100015, 100007),
-       (100016, 100009),
-       (100016, 100010),
-       (100017, 100012),
-       (100018, 100010),
-       (100018, 100011),
-       (100018, 100009);
+INSERT INTO items(menu_id, dish_id, price)
+VALUES (100013, 100008, 333),
+       (100013, 100006, 444),
+       (100013, 100005, 555),
+       (100014, 100004, 11),
+       (100014, 100005, 12),
+       (100014, 100007, 13),
+       (100015, 100004, 55),
+       (100015, 100005, 66),
+       (100015, 100006, 123),
+       (100015, 100007, 321),
+       (100016, 100009, 456),
+       (100016, 100010, 654),
+       (100017, 100012, 753),
+       (100018, 100010, 325),
+       (100018, 100011, 475),
+       (100018, 100009, 325);
