@@ -1,6 +1,5 @@
 package javvernaut.votingsystem.repository;
 
-import javvernaut.votingsystem.model.Dish;
 import javvernaut.votingsystem.model.Menu;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
@@ -31,4 +30,9 @@ public interface MenuRepository extends BaseRepository<Menu> {
     void deleteByIdAndRestaurantId(int id, int restaurantId);
 
     Menu getOneByIdAndRestaurantId(int id, int restaurantId);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Menu m WHERE m.id=:id")
+    int delete(int id);
 }

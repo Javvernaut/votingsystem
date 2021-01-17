@@ -53,5 +53,4 @@ public class UserController extends AbstractUserController {
         log.info("update {}", user);
         super.prepareAndSave(UserUtil.updateFromTo(user, userTo));
     }
-
 }

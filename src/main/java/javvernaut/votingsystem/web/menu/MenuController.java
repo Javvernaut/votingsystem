@@ -78,6 +78,6 @@ public class MenuController {
         log.info("delete {}", id);
         Menu menu = checkNotFoundWithId(menuRepository.findByIdAndRestaurantId(id, restaurantId), id);
         checkDateIsAfterTheCurrent(menu.getDate(), "Menu cannot be removed");
-        menuRepository.delete(menu);
+        checkSingleModification(menuRepository.delete(id), "Menu id=" + id + " missed");
     }
 }

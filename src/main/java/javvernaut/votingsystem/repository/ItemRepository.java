@@ -10,11 +10,6 @@ import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, ItemId> {
 
-/*    @Query("SELECT new javvernaut.votingsystem.to.DishTo(md.dish.id, md.dish.name, md.price)" +
-            "FROM MenuDish md " +
-            "WHERE md.menu.id=:menuId AND md.menu.restaurant.id=:restaurantId")
-    List<DishTo> findAllByMenuIdAndMenuRestaurantId(int menuId, int restaurantId);*/
-
     @Query("SELECT i FROM Item i " +
             "JOIN FETCH i.dish " +
             "WHERE i.menu.id=:menuId AND i.menu.restaurant.id=:restaurantId")

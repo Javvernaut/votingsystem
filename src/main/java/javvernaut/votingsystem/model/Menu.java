@@ -1,5 +1,7 @@
 package javvernaut.votingsystem.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -23,14 +25,11 @@ public class Menu extends AbstractBaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
+    @JsonBackReference
     private Restaurant restaurant;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "menu")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonManagedReference
     private List<Item> items;
-
-    public void addItem(Dish dish, int price) {
-        Item item = new Item(this, dish, price);
-        dish.getItems().add(item);
-    }
 }

@@ -4,7 +4,7 @@ import javvernaut.votingsystem.model.Dish;
 import javvernaut.votingsystem.repository.DishRepository;
 import javvernaut.votingsystem.repository.MenuRepository;
 import javvernaut.votingsystem.repository.RestaurantRepository;
-import javvernaut.votingsystem.util.exception.ForbiddenException;
+import javvernaut.votingsystem.util.exception.IllegalRequestDataException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -49,10 +49,10 @@ public class DishController {
         checkNew(dish);
         dish.setRestaurant(restaurantRepository.getOne(restaurantId));
         Dish created = dishRepository.save(dish);
-        URI uriOfNewResorce = ServletUriComponentsBuilder.fromCurrentRequestUri()
+        URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentRequestUri()
                 .path(RESTAURANT_URL + "/dishes/{id}")
                 .buildAndExpand(created.getRestaurant().getId(), created.getId()).toUri();
-        return ResponseEntity.created(uriOfNewResorce).body(created);
+        return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
     @PutMapping(value = "/dishes/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -76,7 +76,7 @@ public class DishController {
         Dish dish = checkNotFoundWithId(dishRepository.findByIdAndRestaurantId(id, restaurantId),
                 "Dish id=" + id + " doesn't belong to restaurant id=" + restaurantId);
         if (!dish.getItems().isEmpty()) {
-            throw new ForbiddenException("Dish id=" + id + " cannot be deleted. Delete it from menu first.");
+            throw new IllegalRequestDataException("Dish id=" + id + " cannot be deleted. Delete it from menu first.");
         }
         checkSingleModification(dishRepository.deleteByIdAndRestaurantId(id, restaurantId),
                 "Dish id=" + id + ", restaurant id=" + restaurantId + " missed");

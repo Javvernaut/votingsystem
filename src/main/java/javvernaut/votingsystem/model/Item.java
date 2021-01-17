@@ -1,5 +1,6 @@
 package javvernaut.votingsystem.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.data.util.ProxyUtils;
@@ -21,6 +22,7 @@ public class Item {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("menuId")
+    @JsonBackReference
     private Menu menu;
 
     @ManyToOne(fetch = FetchType.LAZY)

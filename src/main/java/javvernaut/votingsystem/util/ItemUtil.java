@@ -1,9 +1,6 @@
 package javvernaut.votingsystem.util;
 
-import javvernaut.votingsystem.model.Dish;
 import javvernaut.votingsystem.model.Item;
-import javvernaut.votingsystem.model.ItemId;
-import javvernaut.votingsystem.model.Menu;
 import javvernaut.votingsystem.to.ItemTo;
 import lombok.experimental.UtilityClass;
 
@@ -13,10 +10,6 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class ItemUtil {
-
-    public static Item createNewFromTo(ItemTo itemTo, Menu menu, Dish dish) {
-        return new Item(menu, dish, itemTo.getPrice());
-    }
 
     public static Item updateFromTo(Item item, ItemTo itemTo) {
         item.setPrice(itemTo.getPrice());

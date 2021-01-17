@@ -2,27 +2,11 @@ package javvernaut.votingsystem.to;
 
 
 import javvernaut.votingsystem.HasId;
-import lombok.ToString;
+import lombok.*;
 
-@ToString
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Data
 public abstract class BaseTo implements HasId {
-
-    public BaseTo() {
-    }
-
-    public BaseTo(Integer id) {
-        this.id = id;
-    }
-
     protected Integer id;
-
-    @Override
-    public Integer getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Integer id) {
-        this.id = id;
-    }
 }

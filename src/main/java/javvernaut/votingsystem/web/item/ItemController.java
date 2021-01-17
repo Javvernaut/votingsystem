@@ -52,7 +52,6 @@ public class ItemController {
     @GetMapping("/{id}")
     public ResponseEntity<ItemTo> get(@PathVariable int restaurantId, @PathVariable int menuId, @PathVariable int id) {
         log.info("get item {}", id);
-        ItemId itemId = new ItemId(menuId, id);
         Item item = checkNotFoundWithId(
                 itemRepository.findByDishIdAndMenuIdAndMenuRestaurantId(id, menuId, restaurantId),
                 "Item with id=" + id +" not found"
@@ -72,7 +71,7 @@ public class ItemController {
         Dish dish = checkNotFoundWithId(dishRepository.findByIdAndRestaurantId(itemTo.getId(), restaurantId), itemTo.getId());
         ItemId itemId = new ItemId(menu.getId(), dish.getId());
         if (itemRepository.findById(itemId).isPresent()) {
-            throw new IllegalRequestDataException("Item with id = " +  itemId.getDishId() + " is present");
+            throw new IllegalRequestDataException("Item with id = " +  itemId.getDishId() + " is present in menu");
         }
         Item created = itemRepository.save(new Item(menu, dish, itemTo.getPrice()));
         URI uriOFNewResource = ServletUriComponentsBuilder.fromCurrentRequestUri()
@@ -83,7 +82,7 @@ public class ItemController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void editPrice(
+    public void update(
             @PathVariable int restaurantId,
             @PathVariable int menuId,
             @PathVariable int id,

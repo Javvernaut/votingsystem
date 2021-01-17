@@ -1,5 +1,6 @@
 package javvernaut.votingsystem.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -18,10 +19,12 @@ public class Restaurant extends AbstractNamedEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonManagedReference
     private List<Menu> menus;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonManagedReference
     private List<Dish> dishes;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")
