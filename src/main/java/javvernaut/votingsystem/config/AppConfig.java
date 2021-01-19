@@ -8,14 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 @Configuration
 public class AppConfig {
-    public static final LocalDate CURRENT_DATE = LocalDate.of(2020, 12, 10);
-    public static final LocalTime CURRENT_TIME = LocalTime.of(11, 0, 0);
-    public static final LocalTime VOTES_DEADLINE = LocalTime.of(11, 0, 0);
+
 
 /*    @Bean
     public HttpTraceRepository httpTraceRepository() {

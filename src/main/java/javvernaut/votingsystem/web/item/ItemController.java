@@ -13,7 +13,6 @@ import javvernaut.votingsystem.util.ItemUtil;
 import javvernaut.votingsystem.util.exception.IllegalRequestDataException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +27,7 @@ import static javvernaut.votingsystem.util.DateUtil.checkDateIsAfterTheCurrent;
 import static javvernaut.votingsystem.util.ItemUtil.updateFromTo;
 import static javvernaut.votingsystem.util.ValidationUtil.assureIdConsistent;
 import static javvernaut.votingsystem.util.ValidationUtil.checkNotFoundWithId;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @Slf4j
@@ -36,7 +36,7 @@ import static javvernaut.votingsystem.util.ValidationUtil.checkNotFoundWithId;
         produces = MediaType.APPLICATION_JSON_VALUE)
 public class ItemController {
 
-    public static final String ITEMS_URL = "/admin/restaurants/{restaurantId}/menus/{menuId}/items";
+    public static final String ITEMS_URL = "/api/admin/restaurants/{restaurantId}/menus/{menuId}/items";
     private final ItemRepository itemRepository;
     private final MenuRepository menuRepository;
     private final DishRepository dishRepository;
@@ -54,7 +54,7 @@ public class ItemController {
         log.info("get item {}", id);
         Item item = checkNotFoundWithId(
                 itemRepository.findByDishIdAndMenuIdAndMenuRestaurantId(id, menuId, restaurantId),
-                "Item with id=" + id +" not found"
+                "Item with id=" + id + " not found"
         );
         return ResponseEntity.ok(ItemUtil.createTo(item));
     }
@@ -71,7 +71,7 @@ public class ItemController {
         Dish dish = checkNotFoundWithId(dishRepository.findByIdAndRestaurantId(itemTo.getId(), restaurantId), itemTo.getId());
         ItemId itemId = new ItemId(menu.getId(), dish.getId());
         if (itemRepository.findById(itemId).isPresent()) {
-            throw new IllegalRequestDataException("Item with id = " +  itemId.getDishId() + " is present in menu");
+            throw new IllegalRequestDataException("Item with id = " + itemId.getDishId() + " is present in menu");
         }
         Item created = itemRepository.save(new Item(menu, dish, itemTo.getPrice()));
         URI uriOFNewResource = ServletUriComponentsBuilder.fromCurrentRequestUri()
@@ -81,7 +81,7 @@ public class ItemController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(NO_CONTENT)
     public void update(
             @PathVariable int restaurantId,
             @PathVariable int menuId,
@@ -90,20 +90,20 @@ public class ItemController {
         log.info("edit {}", itemTo);
         assureIdConsistent(itemTo, id);
         Item item = checkNotFoundWithId(itemRepository.findByDishIdAndMenuIdAndMenuRestaurantId(itemTo.getId(),
-                menuId, restaurantId), "Item with id=" + itemTo.getId() +" not found");
-        checkDateIsAfterTheCurrent(item.getMenu().getDate(),"Item id = " + itemTo.getId() + " cannot be updated.");
+                menuId, restaurantId), "Item with id=" + itemTo.getId() + " not found");
+        checkDateIsAfterTheCurrent(item.getMenu().getDate(), "Item id = " + itemTo.getId() + " cannot be updated.");
         updateFromTo(item, itemTo);
         itemRepository.save(item);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(NO_CONTENT)
     public void delete(@PathVariable int restaurantId, @PathVariable int menuId, @PathVariable int id) {
         log.info("delete item {} from menu {}", id, menuId);
         Item item = checkNotFoundWithId(
                 itemRepository.findByDishIdAndMenuIdAndMenuRestaurantId(id, menuId, restaurantId),
-                "Item with id=" + id +" not found");
-        checkDateIsAfterTheCurrent(item.getMenu().getDate(),"Item id = " + id + " cannot be deleted.");
+                "Item with id=" + id + " not found");
+        checkDateIsAfterTheCurrent(item.getMenu().getDate(), "Item id = " + id + " cannot be deleted.");
         itemRepository.delete(item);
     }
 }

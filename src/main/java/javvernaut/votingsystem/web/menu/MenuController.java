@@ -6,7 +6,6 @@ import javvernaut.votingsystem.repository.MenuRepository;
 import javvernaut.votingsystem.repository.RestaurantRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +18,7 @@ import java.util.List;
 
 import static javvernaut.votingsystem.util.DateUtil.checkDateIsAfterTheCurrent;
 import static javvernaut.votingsystem.util.ValidationUtil.*;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @Slf4j
@@ -26,7 +26,7 @@ import static javvernaut.votingsystem.util.ValidationUtil.*;
 @RequestMapping(value = MenuController.MENUS_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class MenuController {
 
-    public static final String MENUS_URL = "/admin/restaurants/{restaurantId}/menus";
+    public static final String MENUS_URL = "/api/admin/restaurants/{restaurantId}/menus";
     private final MenuRepository menuRepository;
     private final RestaurantRepository restaurantRepository;
     private final DishRepository dishRepository;
@@ -58,7 +58,7 @@ public class MenuController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(NO_CONTENT)
     @Transactional
     public void update(@PathVariable int restaurantId, @PathVariable int id, @Valid @RequestBody Menu menu) {
         log.info("change date of menu={}", id);
@@ -72,7 +72,7 @@ public class MenuController {
     }
 
     @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(NO_CONTENT)
     @Transactional
     public void delete(@PathVariable int restaurantId, @PathVariable int id) {
         log.info("delete {}", id);

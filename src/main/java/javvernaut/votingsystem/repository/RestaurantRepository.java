@@ -1,7 +1,6 @@
 package javvernaut.votingsystem.repository;
 
 import javvernaut.votingsystem.model.Restaurant;
-import javvernaut.votingsystem.to.RestaurantTo;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

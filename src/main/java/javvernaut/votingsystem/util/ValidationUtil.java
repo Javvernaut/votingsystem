@@ -26,7 +26,7 @@ public class ValidationUtil {
     }
 
     public static <T> T checkNotFoundWithId(Optional<T> optional, int id) {
-        return checkNotFoundWithId(optional, "Entity with id=" + id +" not found");
+        return checkNotFoundWithId(optional, "Entity with id=" + id + " not found");
     }
 
     public static <T> T checkNotFoundWithId(Optional<T> optional, String message) {

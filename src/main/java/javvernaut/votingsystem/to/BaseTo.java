@@ -2,7 +2,10 @@ package javvernaut.votingsystem.to;
 
 
 import javvernaut.votingsystem.HasId;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)

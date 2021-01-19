@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,12 +28,12 @@ public interface MenuRepository extends BaseRepository<Menu> {
 
     @Transactional
     @Modifying
-    void deleteByIdAndRestaurantId(int id, int restaurantId);
-
-    Menu getOneByIdAndRestaurantId(int id, int restaurantId);
-
-    @Transactional
-    @Modifying
     @Query("DELETE FROM Menu m WHERE m.id=:id")
     int delete(int id);
+
+    @Query("SELECT m FROM Menu m WHERE m.restaurant.id=:id AND m.date=:date")
+    Optional<Menu> findByRestaurantIdAndDate(int id, LocalDate date);
+
+    @Query("SELECT m FROM Menu m WHERE m.id=:id AND m.restaurant.id=:restaurantId AND m.date=:date")
+    Optional<Menu> findByIdAndRestaurantIdAndDate(int id, int restaurantId, LocalDate date);
 }

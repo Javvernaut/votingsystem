@@ -1,13 +1,13 @@
 package javvernaut.votingsystem.web.dish;
 
 import javvernaut.votingsystem.model.Dish;
+import javvernaut.votingsystem.model.Restaurant;
 import javvernaut.votingsystem.repository.DishRepository;
 import javvernaut.votingsystem.repository.MenuRepository;
 import javvernaut.votingsystem.repository.RestaurantRepository;
 import javvernaut.votingsystem.util.exception.IllegalRequestDataException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.List;
 
 import static javvernaut.votingsystem.util.ValidationUtil.*;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @Slf4j
@@ -26,7 +27,7 @@ import static javvernaut.votingsystem.util.ValidationUtil.*;
 @RequestMapping(DishController.RESTAURANT_URL)
 public class DishController {
 
-    public static final String RESTAURANT_URL = "admin/restaurants/{restaurantId}";
+    public static final String RESTAURANT_URL = "/api/admin/restaurants/{restaurantId}";
     private final DishRepository dishRepository;
     private final RestaurantRepository restaurantRepository;
     private final MenuRepository menuRepository;
@@ -47,7 +48,8 @@ public class DishController {
     public ResponseEntity<Dish> createWithLocation(@PathVariable int restaurantId, @Valid @RequestBody Dish dish) {
         log.info("create {}", dish);
         checkNew(dish);
-        dish.setRestaurant(restaurantRepository.getOne(restaurantId));
+        Restaurant restaurant = checkNotFoundWithId(restaurantRepository.findById(restaurantId), restaurantId);
+        dish.setRestaurant(restaurant);
         Dish created = dishRepository.save(dish);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentRequestUri()
                 .path(RESTAURANT_URL + "/dishes/{id}")
@@ -56,7 +58,7 @@ public class DishController {
     }
 
     @PutMapping(value = "/dishes/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(NO_CONTENT)
     @Transactional
     public void update(@PathVariable int restaurantId, @PathVariable int id, @Valid @RequestBody Dish dish) {
         log.info("update {}", dish);
@@ -69,7 +71,7 @@ public class DishController {
     }
 
     @DeleteMapping("/dishes/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(NO_CONTENT)
     @Transactional
     public void delete(@PathVariable int restaurantId, @PathVariable int id) {
         log.info("delete {}", id);

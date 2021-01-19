@@ -1,8 +1,12 @@
 package javvernaut.votingsystem.web.restaurant;
 
+import javvernaut.votingsystem.model.Menu;
+import javvernaut.votingsystem.repository.ItemRepository;
+import javvernaut.votingsystem.repository.MenuRepository;
 import javvernaut.votingsystem.repository.RestaurantRepository;
 import javvernaut.votingsystem.to.ItemTo;
 import javvernaut.votingsystem.to.RestaurantTo;
+import javvernaut.votingsystem.util.ItemUtil;
 import javvernaut.votingsystem.util.RestaurantUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,18 +18,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
-import static javvernaut.votingsystem.config.AppConfig.CURRENT_DATE;
+import static javvernaut.votingsystem.util.DateUtil.current_date;
 import static javvernaut.votingsystem.util.ValidationUtil.checkNotFoundWithId;
 
 @RestController
 @Slf4j
 @AllArgsConstructor
-@RequestMapping(value = "/restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RestaurantUserController {
 
     private final RestaurantRepository restaurantRepository;
+    private final ItemRepository itemRepository;
+    private final MenuRepository menuRepository;
 
 /*    @GetMapping
     public List<RestaurantTo> getAllWithVotesCountForCurrentDay() {
@@ -34,9 +39,9 @@ public class RestaurantUserController {
     }*/
 
     @GetMapping
-    public List<RestaurantTo> getAllWithVotesCountForCurrentDay() {
+    public List<RestaurantTo> getAllWithVotesCountForCurrentDate() {
         log.info("get all restaurants that presented menu for current date");
-        return RestaurantUtil.getTos(restaurantRepository.findAllTosWithVotesByMenuDate(CURRENT_DATE));
+        return RestaurantUtil.getTos(restaurantRepository.findAllTosWithVotesByMenuDate(current_date));
     }
 
 /*    @GetMapping("/{id}")
@@ -46,17 +51,26 @@ public class RestaurantUserController {
     }*/
 
     @GetMapping("/{id}")
-    public ResponseEntity<RestaurantTo> getForCurrentDay(@PathVariable int id) {
+    public ResponseEntity<RestaurantTo> getForCurrentDate(@PathVariable int id) {
         log.info("get restaurant with id={}", id);
-        return  ResponseEntity.ok(
+        return ResponseEntity.ok(
                 RestaurantUtil.asTo(
-                        checkNotFoundWithId(restaurantRepository.findWithVotesByIdAndMenuDate(id, CURRENT_DATE),
-                                "Restaurant id = " + id + " did not present menu today")));
+                        checkNotFoundWithId(restaurantRepository.findWithVotesByIdAndMenuDate(id, current_date),
+                                "Restaurant id = " + id + " did not provide menu today")));
     }
 
     @GetMapping("/{id}/menu")
-    public List<ItemTo> getMenuForCurrentDay(@PathVariable int id) {
+    public ResponseEntity<Menu> getMenuForCurrentDate(@PathVariable int id) {
         log.info("get current menu for restaurant id={}", id);
-        return null;
+        Menu menu = checkNotFoundWithId(menuRepository.findByRestaurantIdAndDate(id, current_date),
+                "Restaurant id = " + id + " did not provide menu today");
+        return ResponseEntity.ok(menu);
+    }
+
+    @GetMapping("/{id}/menu/items")
+    public List<ItemTo> getMenuItemsForCurrentDate(@PathVariable int id) {
+        Menu menu = checkNotFoundWithId(menuRepository.findByRestaurantIdAndDate(id, current_date),
+                "Restaurant id = " + id + " did not provide menu today");
+        return ItemUtil.getTos(itemRepository.findAllByMenuIdAndMenuRestaurantId(menu.id(), id));
     }
 }

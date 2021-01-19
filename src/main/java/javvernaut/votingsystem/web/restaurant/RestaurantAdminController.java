@@ -4,7 +4,6 @@ import javvernaut.votingsystem.model.Restaurant;
 import javvernaut.votingsystem.repository.RestaurantRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +13,8 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
-import static javvernaut.votingsystem.util.ValidationUtil.assureIdConsistent;
-import static javvernaut.votingsystem.util.ValidationUtil.checkNew;
+import static javvernaut.votingsystem.util.ValidationUtil.*;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @Slf4j
@@ -23,7 +22,7 @@ import static javvernaut.votingsystem.util.ValidationUtil.checkNew;
 @RequestMapping(value = RestaurantAdminController.ADMIN_RESTAURANTS_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class RestaurantAdminController {
 
-    public static final String ADMIN_RESTAURANTS_URL = "admin/restaurants";
+    public static final String ADMIN_RESTAURANTS_URL = "/api/admin/restaurants";
     private final RestaurantRepository repository;
 
     @GetMapping
@@ -39,7 +38,7 @@ public class RestaurantAdminController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(CREATED)
     public ResponseEntity<Restaurant> createWithLocation(@Valid @RequestBody Restaurant restaurant) {
         log.info("create {}", restaurant);
         checkNew(restaurant);
@@ -54,12 +53,14 @@ public class RestaurantAdminController {
     public void update(@Valid @RequestBody Restaurant restaurant, @PathVariable int id) {
         log.info("update {}", restaurant);
         assureIdConsistent(restaurant, id);
+        checkNotFoundWithId(repository.findById(id), id);
         repository.save(restaurant);
     }
 
+    //TODO check votes
     @DeleteMapping("/{id}")
     public void delete(@PathVariable int id) {
         log.info("delete {}", id);
-        repository.delete(id);
+        checkSingleModification(repository.delete(id), "Restaurant id=" + id + " missed");
     }
 }

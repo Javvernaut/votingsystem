@@ -1,5 +1,6 @@
 package javvernaut.votingsystem.config;
 
+import javvernaut.votingsystem.model.Role;
 import javvernaut.votingsystem.repository.UserRepository;
 import javvernaut.votingsystem.util.security.AuthorizedUser;
 import lombok.AllArgsConstructor;
@@ -25,15 +26,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
                 .authorizeRequests()
-                .antMatchers("/profile/register").anonymous()
-                .antMatchers("/restaurants/**").anonymous()
-                //.antMatchers("/**").authenticated()
+                .antMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
+                .antMatchers("/api/profile/register").anonymous()
+                .antMatchers("/api/restaurants/**").permitAll()
+                .antMatchers("/api/**").authenticated()
                 .and()
-                .httpBasic();
+                .httpBasic()
+                .and()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Override

@@ -3,7 +3,6 @@ package javvernaut.votingsystem.web.user;
 import javvernaut.votingsystem.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +14,13 @@ import java.net.URI;
 import java.util.List;
 
 import static javvernaut.votingsystem.util.ValidationUtil.checkNew;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping(value = AdminController.ADMIN_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 public class AdminController extends AbstractUserController {
-    static final String ADMIN_URL = "/admin/users";
+    static final String ADMIN_URL = "/api/admin/users";
 
     @GetMapping
     public List<User> getAll() {
@@ -50,15 +50,16 @@ public class AdminController extends AbstractUserController {
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
+    //TODO check votes
     @Override
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(NO_CONTENT)
     public void delete(@PathVariable int id) {
         super.delete(id);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(NO_CONTENT)
     public void update(@Valid @RequestBody User user, @PathVariable int id) {
         validateBeforeUpdate(user, id);
         log.info("update {}", user);
@@ -66,7 +67,7 @@ public class AdminController extends AbstractUserController {
     }
 
     @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(NO_CONTENT)
     @Transactional
     public void enable(@PathVariable int id, @RequestParam boolean enabled) {
         User user = repository.getExisted(id);

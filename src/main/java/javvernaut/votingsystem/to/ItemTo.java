@@ -1,6 +1,7 @@
 package javvernaut.votingsystem.to;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
