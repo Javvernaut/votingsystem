@@ -1,6 +1,7 @@
 package javvernaut.votingsystem.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import javvernaut.votingsystem.HasIdAndEmail;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -18,8 +19,8 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(callSuper = true, exclude = {"password"})
-public class User extends AbstractNamedEntity {
+@ToString(callSuper = true, exclude = {"password", "votes"})
+public class User extends AbstractNamedEntity implements HasIdAndEmail {
 
     @Column(name = "email", nullable = false, unique = true)
     @Email
@@ -50,8 +51,7 @@ public class User extends AbstractNamedEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Role> roles;
 
-    @OneToMany
-    @JoinColumn(name = "user_id")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Vote> votes;
 
