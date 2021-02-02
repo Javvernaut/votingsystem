@@ -14,7 +14,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
+@ToString(exclude = {"menu", "dish"})
 public class Item {
 
     @EmbeddedId

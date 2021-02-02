@@ -45,4 +45,8 @@ public interface RestaurantRepository extends BaseRepository<Restaurant> {
     @EntityGraph(attributePaths = {"votes"}, type = EntityGraph.EntityGraphType.LOAD)
     @Query("SELECT r FROM Restaurant r INNER JOIN r.menus m WHERE r.id=:id AND m.date=:date")
     Optional<Restaurant> findWithVotesByIdAndMenuDate(int id, LocalDate date);
+
+    List<Restaurant> findAllByOrderByName();
+
+    Optional<Restaurant> findByNameIgnoreCase(String name);
 }

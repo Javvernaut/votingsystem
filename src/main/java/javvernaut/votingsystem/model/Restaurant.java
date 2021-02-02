@@ -1,6 +1,7 @@
 package javvernaut.votingsystem.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import javvernaut.votingsystem.HasIdAndName;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -15,7 +16,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(callSuper = true, exclude = {"menus", "dishes", "votes"})
-public class Restaurant extends AbstractNamedEntity {
+public class Restaurant extends AbstractNamedEntity implements HasIdAndName {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -30,4 +31,8 @@ public class Restaurant extends AbstractNamedEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Vote> votes;
+
+    public Restaurant(Integer id, String name) {
+        super(id, name);
+    }
 }

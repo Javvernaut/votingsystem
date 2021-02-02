@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static javvernaut.votingsystem.util.ValidationUtil.*;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @Slf4j
@@ -25,10 +27,17 @@ public class RestaurantAdminController {
     public static final String ADMIN_RESTAURANTS_URL = "/api/admin/restaurants";
     private final RestaurantRepository repository;
 
+    private final UniqueNameValidator nameValidator;
+
+    @InitBinder
+    private void initBinder(WebDataBinder binder) {
+        binder.addValidators(nameValidator);
+    }
+
     @GetMapping
     public List<Restaurant> getAll() {
         log.info("get all");
-        return repository.findAll();
+        return repository.findAllByOrderByName();
     }
 
     @GetMapping("/{id}")
@@ -50,6 +59,7 @@ public class RestaurantAdminController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(NO_CONTENT)
     public void update(@Valid @RequestBody Restaurant restaurant, @PathVariable int id) {
         log.info("update {}", restaurant);
         assureIdConsistent(restaurant, id);
@@ -59,6 +69,7 @@ public class RestaurantAdminController {
 
     //TODO check votes
     @DeleteMapping("/{id}")
+    @ResponseStatus(NO_CONTENT)
     public void delete(@PathVariable int id) {
         log.info("delete {}", id);
         checkSingleModification(repository.delete(id), "Restaurant id=" + id + " missed");

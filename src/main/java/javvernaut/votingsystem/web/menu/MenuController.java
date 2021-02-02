@@ -77,7 +77,7 @@ public class MenuController {
     public void delete(@PathVariable int restaurantId, @PathVariable int id) {
         log.info("delete {}", id);
         Menu menu = checkNotFoundWithId(menuRepository.findByIdAndRestaurantId(id, restaurantId), id);
-        checkDateIsAfterTheCurrent(menu.getDate(), "Menu cannot be removed");
+        checkDateIsAfterTheCurrent(menu.getDate(), "Menu cannot be deleted");
         checkSingleModification(menuRepository.delete(id), "Menu id=" + id + " missed");
     }
 }

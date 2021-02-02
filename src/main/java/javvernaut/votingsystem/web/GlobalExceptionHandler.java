@@ -4,6 +4,7 @@ import javvernaut.votingsystem.util.exception.AppException;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +23,45 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public static final String EXCEPTION_DUPLICATE_EMAIL = "User with this email already exists";
+    public static final String EXCEPTION_RESTAURANT_DUPLICATE_NAME = "Restaurant with this name already exists";
+
+    public static final Map<String, String> constraints_map = Map.of(
+            "dishes_unique_name_restaurant_idx", "Dish with this name already exists in this restaurant"
+    );
 
     private final ErrorAttributes errorAttributes;
+
+    public static Throwable getRootCause(Throwable t) {
+        Throwable result = t;
+        Throwable cause;
+
+        while (null != (cause = result.getCause()) && (result != cause)) {
+            result = cause;
+        }
+        return result;
+    }
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<?> appException(WebRequest request, AppException ex) {
         return createResponseEntity(getDefaultBody(request, ex.getOptions(), null), ex.getStatus());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> dbException(WebRequest request, DataIntegrityViolationException ex) {
+        String rootMessage = getRootCause(ex).getMessage();
+        if (rootMessage != null) {
+            for (Map.Entry<String, String> constraintPair : constraints_map.entrySet()) {
+                if (rootMessage.toLowerCase().contains(constraintPair.getKey())) {
+                    return createResponseEntity(
+                            getDefaultBody(
+                                    request,
+                                    ErrorAttributeOptions.defaults(),
+                                    constraintPair.getValue()),
+                            HttpStatus.UNPROCESSABLE_ENTITY);
+                }
+            }
+        }
+        return createResponseEntity(getDefaultBody(request, ErrorAttributeOptions.defaults(), null), HttpStatus.CONFLICT);
     }
 
     @Override

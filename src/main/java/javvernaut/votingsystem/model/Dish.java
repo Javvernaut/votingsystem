@@ -24,4 +24,13 @@ public class Dish extends AbstractNamedEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "dish")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Item> items;
+
+    public Dish(Integer id, String name) {
+        super(id, name);
+    }
+
+    public Dish(Dish dish) {
+        this.id = dish.getId();
+        this.name = dish.getName();
+    }
 }

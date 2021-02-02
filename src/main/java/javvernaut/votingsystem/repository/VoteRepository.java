@@ -14,6 +14,7 @@ public interface VoteRepository extends BaseRepository<Vote> {
     @EntityGraph(attributePaths = {"restaurant"}, type = EntityGraph.EntityGraphType.LOAD)
     List<Vote> findAllByUserId(int id);
 
+    //TODO check joins in queries
     Optional<Vote> findByIdAndUserIdAndDate(int id, int userId, LocalDate currentDate);
 
     @Transactional

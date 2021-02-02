@@ -89,9 +89,10 @@ class AdminControllerTest extends AbstractControllerTest {
                 .content(jsonWithPassword(newUser, "newPass")))
                 .andExpect(status().isCreated());
         User created = readFromJson(action, User.class);
-        newUser.setId(created.getId());
+        int newId = created.id();
+        newUser.setId(newId);
         USER_MATCHER.assertMatch(created, newUser);
-        USER_MATCHER.assertMatch(userRepository.getExisted(created.id()), newUser);
+        USER_MATCHER.assertMatch(userRepository.getExisted(newId), newUser);
     }
 
     @Test
@@ -126,11 +127,12 @@ class AdminControllerTest extends AbstractControllerTest {
     @Test
     void enable() throws Exception {
         perform(MockMvcRequestBuilders.patch(TEST_ADMIN_URL + USER2_ID)
-        .param("enabled", "false")
-        .with(getHttpBasic(mockAdmin)))
+                .param("enabled", "false")
+                .with(getHttpBasic(mockAdmin)))
                 .andExpect(status().isNoContent());
         assertFalse(userRepository.getExisted(USER2_ID).isEnabled());
     }
+
     @Test
     void createInvalid() throws Exception {
         User invalid = new User(null, null, "", "newPass", Role.USER, Role.ADMIN);
@@ -156,13 +158,12 @@ class AdminControllerTest extends AbstractControllerTest {
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
-    void updateDuplicate() throws Exception {
-        User updated = new User(mockUser);
-        updated.setEmail("admin@gmail.com");
-        perform(MockMvcRequestBuilders.put(TEST_ADMIN_URL + USER_ID)
+    void createDuplicate() throws Exception {
+        User duplicate = new User(null, "New", "user@ya.ru", "newPass", Role.USER, Role.ADMIN);
+        perform(MockMvcRequestBuilders.post(TEST_ADMIN_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(getHttpBasic(mockAdmin))
-                .content(jsonWithPassword(updated, "password")))
+                .content(jsonWithPassword(duplicate, "newPass")))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(content().string(containsString(GlobalExceptionHandler.EXCEPTION_DUPLICATE_EMAIL)));
@@ -170,12 +171,13 @@ class AdminControllerTest extends AbstractControllerTest {
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
-    void createDuplicate() throws Exception {
-        User expected = new User(null, "New", "user@ya.ru", "newPass", Role.USER, Role.ADMIN);
-        perform(MockMvcRequestBuilders.post(TEST_ADMIN_URL)
+    void updateDuplicate() throws Exception {
+        User duplicate = new User(mockUser);
+        duplicate.setEmail(mockAdmin.getEmail());
+        perform(MockMvcRequestBuilders.put(TEST_ADMIN_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(getHttpBasic(mockAdmin))
-                .content(jsonWithPassword(expected, "newPass")))
+                .content(jsonWithPassword(duplicate, "password")))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(content().string(containsString(GlobalExceptionHandler.EXCEPTION_DUPLICATE_EMAIL)));
