@@ -7,6 +7,7 @@ import static javvernaut.votingsystem.model.AbstractBaseEntity.START_SEQ;
 
 public class DishTestData {
     public static final TestMatcher<Dish> DISH_MATCHER = TestMatcher.usingIgnoringFieldsComparator(Dish.class, "restaurant", "items");
+
     public static final int DISH1_ID = START_SEQ + 6;
     public static final int DISH2_ID = START_SEQ + 7;
     public static final int DISH3_ID = START_SEQ + 8;

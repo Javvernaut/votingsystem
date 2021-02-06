@@ -28,9 +28,4 @@ public class Dish extends AbstractNamedEntity {
     public Dish(Integer id, String name) {
         super(id, name);
     }
-
-    public Dish(Dish dish) {
-        this.id = dish.getId();
-        this.name = dish.getName();
-    }
 }

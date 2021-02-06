@@ -13,14 +13,12 @@ import java.util.Optional;
 
 @Transactional(readOnly = true)
 public interface MenuRepository extends BaseRepository<Menu> {
-    List<Menu> findAll();
 
     @EntityGraph(attributePaths = "restaurant", type = EntityGraph.EntityGraphType.LOAD)
     @Query("SELECT m FROM Menu m")
     List<Menu> getWithRestaurants();
 
-    //@EntityGraph(attributePaths = {"restaurant"}, type = EntityGraph.EntityGraphType.LOAD)
-    @Query("SELECT m FROM Menu m WHERE m.restaurant.id=:id")
+    @Query("SELECT m FROM Menu m WHERE m.restaurant.id=:id ORDER BY m.menuDate")
     List<Menu> findAllByRestaurantId(@Param("id") int id);
 
     @Query("SELECT m FROM Menu m WHERE m.id=:id AND m.restaurant.id=:restaurantId")
@@ -31,9 +29,9 @@ public interface MenuRepository extends BaseRepository<Menu> {
     @Query("DELETE FROM Menu m WHERE m.id=:id")
     int delete(int id);
 
-    @Query("SELECT m FROM Menu m WHERE m.restaurant.id=:id AND m.date=:date")
+    @Query("SELECT m FROM Menu m WHERE m.restaurant.id=:id AND m.menuDate=:date")
     Optional<Menu> findByRestaurantIdAndDate(int id, LocalDate date);
 
-    @Query("SELECT m FROM Menu m WHERE m.id=:id AND m.restaurant.id=:restaurantId AND m.date=:date")
+    @Query("SELECT m FROM Menu m WHERE m.id=:id AND m.restaurant.id=:restaurantId AND m.menuDate=:date")
     Optional<Menu> findByIdAndRestaurantIdAndDate(int id, int restaurantId, LocalDate date);
 }

@@ -48,7 +48,7 @@ public class MenuController {
     public ResponseEntity<Menu> createWithLocation(@PathVariable int restaurantId, @Valid @RequestBody Menu menu) {
         log.info("create {}", menu);
         checkNew(menu);
-        checkDateIsAfterTheCurrent(menu.getDate(), "New date must be greater the current");
+        checkDateIsAfterTheCurrent(menu.getMenuDate(), "New date must be greater the current");
         menu.setRestaurant(restaurantRepository.getOne(restaurantId));
         Menu created = menuRepository.save(menu);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -65,8 +65,8 @@ public class MenuController {
         assureIdConsistent(menu, id);
         Menu existed = checkNotFoundWithId(menuRepository.findByIdAndRestaurantId(id, restaurantId),
                 "Menu id=" + id + " doesn't belong to restaurant id=" + restaurantId);
-        checkDateIsAfterTheCurrent(existed.getDate(), "Date cannot be changed");
-        checkDateIsAfterTheCurrent(menu.getDate(), "New date must be greater the current");
+        checkDateIsAfterTheCurrent(existed.getMenuDate(), "Date cannot be changed");
+        checkDateIsAfterTheCurrent(menu.getMenuDate(), "New date must be greater the current");
         menu.setRestaurant(restaurantRepository.getOne(restaurantId));
         menuRepository.save(menu);
     }
@@ -77,7 +77,7 @@ public class MenuController {
     public void delete(@PathVariable int restaurantId, @PathVariable int id) {
         log.info("delete {}", id);
         Menu menu = checkNotFoundWithId(menuRepository.findByIdAndRestaurantId(id, restaurantId), id);
-        checkDateIsAfterTheCurrent(menu.getDate(), "Menu cannot be deleted");
+        checkDateIsAfterTheCurrent(menu.getMenuDate(), "Menu cannot be deleted");
         checkSingleModification(menuRepository.delete(id), "Menu id=" + id + " missed");
     }
 }

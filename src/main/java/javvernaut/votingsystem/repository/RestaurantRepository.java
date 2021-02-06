@@ -19,7 +19,7 @@ public interface RestaurantRepository extends BaseRepository<Restaurant> {
     @Query("DELETE FROM Restaurant r WHERE r.id=:id")
     int delete(@Param("id") int id);
 
-    @Query("SELECT r FROM Restaurant r INNER JOIN r.menus m WHERE r.id=:id AND m.date=:date")
+    @Query("SELECT r FROM Restaurant r INNER JOIN r.menus m WHERE r.id=:id AND m.menuDate=:date")
     Optional<Restaurant> findByIdAndMenuDate(int id, LocalDate date);
 
 /*    @Query("SELECT new javvernaut.votingsystem.to.RestaurantTo(r.id, r.name, COUNT (v)) " +
@@ -31,7 +31,7 @@ public interface RestaurantRepository extends BaseRepository<Restaurant> {
     List<RestaurantTo> findAllTosWithVotesByMenuDate(LocalDate date);*/
 
     @EntityGraph(attributePaths = {"votes"}, type = EntityGraph.EntityGraphType.LOAD)
-    @Query("SELECT r FROM Restaurant r INNER JOIN r.menus m WHERE m.date=:date")
+    @Query("SELECT r FROM Restaurant r INNER JOIN r.menus m WHERE m.menuDate=:date")
     List<Restaurant> findAllTosWithVotesByMenuDate(LocalDate date);
 
 /*    @Query("SELECT new javvernaut.votingsystem.to.RestaurantTo(r.id, r.name, COUNT (v)) " +
@@ -43,7 +43,7 @@ public interface RestaurantRepository extends BaseRepository<Restaurant> {
     Optional<RestaurantTo> findToByIdAndMenuDate(int id, LocalDate date);*/
 
     @EntityGraph(attributePaths = {"votes"}, type = EntityGraph.EntityGraphType.LOAD)
-    @Query("SELECT r FROM Restaurant r INNER JOIN r.menus m WHERE r.id=:id AND m.date=:date")
+    @Query("SELECT r FROM Restaurant r INNER JOIN r.menus m WHERE r.id=:id AND m.menuDate=:date")
     Optional<Restaurant> findWithVotesByIdAndMenuDate(int id, LocalDate date);
 
     List<Restaurant> findAllByOrderByName();

@@ -10,34 +10,34 @@ import java.util.Objects;
 
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "items")
+@Table(name = "items", uniqueConstraints = @UniqueConstraint(columnNames = {"menu_id", "dish_id"}, name = "items_unique_menu_dish_idx"))
 @Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = {"menu", "dish"})
-public class Item {
-
-    @EmbeddedId
-    private ItemId id;
+public class Item extends AbstractBaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("menuId")
+    @JoinColumn(name = "menu_id", nullable = false)
     @JsonBackReference
     private Menu menu;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("dishId")
+    @JoinColumn(name = "dish_id", nullable = false)
     private Dish dish;
 
     @Column(name = "price", nullable = false)
     @Range(min = 0)
     private Integer price = 0;
 
-    public Item(Menu menu, Dish dish, Integer price) {
+    public Item(Integer id, Menu menu, Dish dish, Integer price) {
+        super(id);
         this.menu = menu;
         this.dish = dish;
         this.price = price;
-        id = new ItemId(menu.getId(), dish.getId());
+    }
+
+    public Item(Integer id, Integer price) {
     }
 
     @Override

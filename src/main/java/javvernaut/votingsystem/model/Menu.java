@@ -12,16 +12,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "menus", uniqueConstraints = @UniqueConstraint(columnNames = {"date", "restaurant_id"}, name = "menus_unique_date_restaurant_idx"))
+@Table(name = "menus", uniqueConstraints = @UniqueConstraint(columnNames = {"menu_date", "restaurant_id"}, name = "menus_unique_date_restaurant_idx"))
 @Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(callSuper = true, exclude = {"restaurant", "items"})
 public class Menu extends AbstractBaseEntity {
 
-    @Column(name = "date", nullable = false, columnDefinition = "timestamp default now()")
+    @Column(name = "menu_date", nullable = false, columnDefinition = "date")
     @NotNull
-    private LocalDate date;
+    private LocalDate menuDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
@@ -32,4 +32,14 @@ public class Menu extends AbstractBaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonManagedReference
     private List<Item> items;
+
+    public Menu(Integer id, LocalDate menuDate) {
+        this.id = id;
+        this.menuDate = menuDate;
+    }
+
+    public Menu(Menu menu) {
+        this.id = id();
+        this.menuDate = menu.getMenuDate();
+    }
 }

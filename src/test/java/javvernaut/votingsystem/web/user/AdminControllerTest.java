@@ -87,6 +87,7 @@ class AdminControllerTest extends AbstractControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(getHttpBasic(mockAdmin))
                 .content(jsonWithPassword(newUser, "newPass")))
+                .andDo(print())
                 .andExpect(status().isCreated());
         User created = readFromJson(action, User.class);
         int newId = created.id();

@@ -24,9 +24,14 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public static final String EXCEPTION_DUPLICATE_EMAIL = "User with this email already exists";
     public static final String EXCEPTION_RESTAURANT_DUPLICATE_NAME = "Restaurant with this name already exists";
+    public static final String EXCEPTION_DUPLICATE_DISH_NAME = "Dish with this name already exists in this restaurant";
+    public static final String EXCEPTION_DUPLICATE_MENU_DATE = "Menu with this date already exists in this restaurant";
+    public static final String EXCEPTION_DUPLICATE_ITEM = "item already exists in this menu";
 
     public static final Map<String, String> constraints_map = Map.of(
-            "dishes_unique_name_restaurant_idx", "Dish with this name already exists in this restaurant"
+            "dishes_unique_name_restaurant_idx", EXCEPTION_DUPLICATE_DISH_NAME,
+            "menus_unique_date_restaurant_idx", EXCEPTION_DUPLICATE_MENU_DATE,
+            "items_unique_menu_dish_idx", EXCEPTION_DUPLICATE_ITEM
     );
 
     private final ErrorAttributes errorAttributes;

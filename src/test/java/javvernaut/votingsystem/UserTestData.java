@@ -3,7 +3,6 @@ package javvernaut.votingsystem;
 import javvernaut.votingsystem.model.Role;
 import javvernaut.votingsystem.model.User;
 import javvernaut.votingsystem.util.JsonUtil;
-import org.junit.platform.commons.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Date;

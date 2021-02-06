@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface VoteRepository extends BaseRepository<Vote> {
+
     @EntityGraph(attributePaths = {"restaurant"}, type = EntityGraph.EntityGraphType.LOAD)
+    @Query("SELECT v FROM Vote v WHERE v.user.id=:id")
     List<Vote> findAllByUserId(int id);
 
     //TODO check joins in queries

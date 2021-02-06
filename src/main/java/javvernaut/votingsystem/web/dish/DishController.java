@@ -25,10 +25,10 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @RestController
 @Slf4j
 @AllArgsConstructor
-@RequestMapping(DishController.DISH_URL)
+@RequestMapping(DishController.DISHES_URL)
 public class DishController {
 
-    public static final String DISH_URL = "/api/admin/restaurants/{restaurantId}/dishes";
+    public static final String DISHES_URL = "/api/admin/restaurants/{restaurantId}/dishes";
     private final DishRepository dishRepository;
     private final RestaurantRepository restaurantRepository;
     private final MenuRepository menuRepository;
@@ -52,8 +52,8 @@ public class DishController {
         Restaurant restaurant = checkNotFoundWithId(restaurantRepository.findById(restaurantId), restaurantId);
         dish.setRestaurant(restaurant);
         Dish created = dishRepository.save(dish);
-        URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentRequestUri()
-                .path(DISH_URL + "/{id}")
+        URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(DISHES_URL + "/{id}")
                 .buildAndExpand(created.getRestaurant().getId(), created.getId()).toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
@@ -64,9 +64,7 @@ public class DishController {
     public void update(@PathVariable int restaurantId, @PathVariable int id, @Valid @RequestBody Dish dish) {
         log.info("update {}", dish);
         assureIdConsistent(dish, id);
-        checkNotFoundWithId(
-                dishRepository.findByIdAndRestaurantId(id, restaurantId),
-                "Dish id=" + id + " doesn't belong to restaurant id=" + restaurantId);
+        checkNotFoundWithIdAndRestaurantId(id, restaurantId);
         dish.setRestaurant(restaurantRepository.getOne(restaurantId));
         dishRepository.save(dish);
     }
@@ -76,12 +74,15 @@ public class DishController {
     @Transactional
     public void delete(@PathVariable int restaurantId, @PathVariable int id) {
         log.info("delete {}", id);
-        Dish dish = checkNotFoundWithId(dishRepository.findByIdAndRestaurantId(id, restaurantId),
-                "Dish id=" + id + " doesn't belong to restaurant id=" + restaurantId);
+        Dish dish = checkNotFoundWithIdAndRestaurantId(id, restaurantId);
         if (!CollectionUtils.isEmpty(dish.getItems())) {
             throw new ForbiddenException("Dish id=" + id + " cannot be deleted. Delete it from menu first.");
         }
-        checkSingleModification(dishRepository.deleteByIdAndRestaurantId(id, restaurantId),
-                "Dish id=" + id + ", restaurant id=" + restaurantId + " missed");
+        checkSingleModification(dishRepository.deleteByIdAndRestaurantId(id, restaurantId), "Dish id=" + id + " missed");
+    }
+
+    private Dish checkNotFoundWithIdAndRestaurantId(int id, int restaurantId) {
+        return checkNotFoundWithId(dishRepository.findByIdAndRestaurantId(id, restaurantId),
+                "Dish id=" + id + " doesn't belong to restaurant id=" + restaurantId);
     }
 }

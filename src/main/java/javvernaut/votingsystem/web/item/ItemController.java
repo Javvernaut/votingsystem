@@ -2,7 +2,6 @@ package javvernaut.votingsystem.web.item;
 
 import javvernaut.votingsystem.model.Dish;
 import javvernaut.votingsystem.model.Item;
-import javvernaut.votingsystem.model.ItemId;
 import javvernaut.votingsystem.model.Menu;
 import javvernaut.votingsystem.repository.DishRepository;
 import javvernaut.votingsystem.repository.ItemRepository;
@@ -10,23 +9,21 @@ import javvernaut.votingsystem.repository.MenuRepository;
 import javvernaut.votingsystem.repository.RestaurantRepository;
 import javvernaut.votingsystem.to.ItemTo;
 import javvernaut.votingsystem.util.ItemUtil;
-import javvernaut.votingsystem.util.exception.IllegalRequestDataException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import static javvernaut.votingsystem.util.DateUtil.checkDateIsAfterTheCurrent;
-import static javvernaut.votingsystem.util.ItemUtil.updateFromTo;
-import static javvernaut.votingsystem.util.ValidationUtil.assureIdConsistent;
-import static javvernaut.votingsystem.util.ValidationUtil.checkNotFoundWithId;
+import static javvernaut.votingsystem.util.ItemUtil.updatePriceFromTo;
+import static javvernaut.votingsystem.util.ValidationUtil.*;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
@@ -52,48 +49,40 @@ public class ItemController {
     @GetMapping("/{id}")
     public ResponseEntity<ItemTo> get(@PathVariable int restaurantId, @PathVariable int menuId, @PathVariable int id) {
         log.info("get item {}", id);
-        Item item = checkNotFoundWithId(
-                itemRepository.findByDishIdAndMenuIdAndMenuRestaurantId(id, menuId, restaurantId),
-                "Item with id=" + id + " not found"
-        );
-        return ResponseEntity.ok(ItemUtil.createTo(item));
+        Optional<Item> item = itemRepository.findByIdAndMenuIdAndMenuRestaurantIdFetchAll(id, menuId, restaurantId);
+        return item.map(value -> ResponseEntity.ok(ItemUtil.createTo(value))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
     public ResponseEntity<ItemTo> createWithLocation(
             @PathVariable int restaurantId,
             @PathVariable int menuId,
             @Valid @RequestBody ItemTo itemTo) {
         log.info("add item {} to menu", itemTo);
         Menu menu = checkNotFoundWithId(menuRepository.findByIdAndRestaurantId(menuId, restaurantId), menuId);
-        checkDateIsAfterTheCurrent(menu.getDate(), "Item id = " + itemTo.getId() + " cannot be added.");
-        Dish dish = checkNotFoundWithId(dishRepository.findByIdAndRestaurantId(itemTo.getId(), restaurantId), itemTo.getId());
-        ItemId itemId = new ItemId(menu.getId(), dish.getId());
-        if (itemRepository.findById(itemId).isPresent()) {
-            throw new IllegalRequestDataException("Item with id = " + itemId.getDishId() + " is present in menu");
-        }
-        Item created = itemRepository.save(new Item(menu, dish, itemTo.getPrice()));
-        URI uriOFNewResource = ServletUriComponentsBuilder.fromCurrentRequestUri()
-                .path(ITEMS_URL + "{/id}")
-                .buildAndExpand(restaurantId, menuId, created.getId().getDishId()).toUri();
+        checkDateIsAfterTheCurrent(menu.getMenuDate(), "Item cannot be added.");
+        Dish dish = checkNotFoundWithId(dishRepository.findByIdAndRestaurantId(itemTo.getDishId(), restaurantId), itemTo.getDishId());
+        Item created = itemRepository.save(new Item(null, menu, dish, itemTo.getPrice()));
+        URI uriOFNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(ITEMS_URL + "/{id}")
+                .buildAndExpand(restaurantId, menuId, created.getId()).toUri();
         return ResponseEntity.created(uriOFNewResource).body(ItemUtil.createTo(created));
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
-    public void update(
+    public void updatePrice(
             @PathVariable int restaurantId,
             @PathVariable int menuId,
             @PathVariable int id,
             @Valid @RequestBody ItemTo itemTo) {
         log.info("edit {}", itemTo);
         assureIdConsistent(itemTo, id);
-        Item item = checkNotFoundWithId(itemRepository.findByDishIdAndMenuIdAndMenuRestaurantId(itemTo.getId(),
+        Item item = checkNotFoundWithId(itemRepository.findByIdAndMenuIdAndMenuRestaurantIdFetchAll(itemTo.getId(),
                 menuId, restaurantId), "Item with id=" + itemTo.getId() + " not found");
-        checkDateIsAfterTheCurrent(item.getMenu().getDate(), "Item id = " + itemTo.getId() + " cannot be updated.");
-        updateFromTo(item, itemTo);
-        itemRepository.save(item);
+        checkDateIsAfterTheCurrent(item.getMenu().getMenuDate(), "Item id = " + itemTo.getId() + " cannot be updated.");
+        updatePriceFromTo(item, itemTo);
     }
 
     @DeleteMapping("/{id}")
@@ -101,9 +90,9 @@ public class ItemController {
     public void delete(@PathVariable int restaurantId, @PathVariable int menuId, @PathVariable int id) {
         log.info("delete item {} from menu {}", id, menuId);
         Item item = checkNotFoundWithId(
-                itemRepository.findByDishIdAndMenuIdAndMenuRestaurantId(id, menuId, restaurantId),
+                itemRepository.findByIdAndMenuIdAndMenuRestaurantId(id, menuId, restaurantId),
                 "Item with id=" + id + " not found");
-        checkDateIsAfterTheCurrent(item.getMenu().getDate(), "Item id = " + id + " cannot be deleted.");
-        itemRepository.delete(item);
+        checkDateIsAfterTheCurrent(item.getMenu().getMenuDate(), "Item id = " + id + " cannot be deleted.");
+        checkSingleModification(itemRepository.deleteByItem(item),"Item id=" + item.getId() + " missed");
     }
 }
