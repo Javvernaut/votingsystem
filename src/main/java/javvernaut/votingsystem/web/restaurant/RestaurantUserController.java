@@ -7,7 +7,6 @@ import javvernaut.votingsystem.repository.RestaurantRepository;
 import javvernaut.votingsystem.to.ItemTo;
 import javvernaut.votingsystem.to.RestaurantTo;
 import javvernaut.votingsystem.util.ItemUtil;
-import javvernaut.votingsystem.util.RestaurantUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -25,38 +24,24 @@ import static javvernaut.votingsystem.util.ValidationUtil.checkNotFoundWithId;
 @RestController
 @Slf4j
 @AllArgsConstructor
-@RequestMapping(value = "/api/restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = RestaurantUserController.USER_RESTAURANTS_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class RestaurantUserController {
+    public static final String USER_RESTAURANTS_URL = "/api/restaurants";
 
     private final RestaurantRepository restaurantRepository;
     private final ItemRepository itemRepository;
     private final MenuRepository menuRepository;
 
-/*    @GetMapping
+    @GetMapping
     public List<RestaurantTo> getAllWithVotesCountForCurrentDay() {
         log.info("get all restaurants that presented menu for current date");
-        return restaurantRepository.findAllTosWithVotesByMenuDate(CURRENT_DATE);
-    }*/
-
-    @GetMapping
-    public List<RestaurantTo> getAllWithVotesCountForCurrentDate() {
-        log.info("get all restaurants that presented menu for current date");
-        return RestaurantUtil.getTos(restaurantRepository.findAllTosWithVotesByMenuDate(current_date));
+        return restaurantRepository.findAllTosWithVotesByMenuDate(current_date);
     }
 
-/*    @GetMapping("/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<RestaurantTo> getForCurrentDay(@PathVariable int id) {
         log.info("get restaurant with id={}", id);
-        return  ResponseEntity.of(restaurantRepository.findToByIdAndMenuDate(id, CURRENT_DATE));
-    }*/
-
-    @GetMapping("/{id}")
-    public ResponseEntity<RestaurantTo> getForCurrentDate(@PathVariable int id) {
-        log.info("get restaurant with id={}", id);
-        return ResponseEntity.ok(
-                RestaurantUtil.asTo(
-                        checkNotFoundWithId(restaurantRepository.findWithVotesByIdAndMenuDate(id, current_date),
-                                "Restaurant id = " + id + " did not provide menu today")));
+        return ResponseEntity.of(restaurantRepository.findToByIdAndMenuDate(id, current_date));
     }
 
     @GetMapping("/{id}/menu")

@@ -13,14 +13,14 @@ import java.util.Optional;
 public interface VoteRepository extends BaseRepository<Vote> {
 
     @EntityGraph(attributePaths = {"restaurant"}, type = EntityGraph.EntityGraphType.LOAD)
-    @Query("SELECT v FROM Vote v WHERE v.user.id=:id")
+    @Query("SELECT v FROM Vote v WHERE v.user.id=:id ORDER BY v.voteDate DESC")
     List<Vote> findAllByUserId(int id);
 
-    //TODO check joins in queries
-    Optional<Vote> findByIdAndUserIdAndDate(int id, int userId, LocalDate currentDate);
+    @Query("SELECT v FROM Vote v WHERE v.user.id=:id AND v.voteDate=:date")
+    Optional<Vote> findByUserIdAndDate(int id, LocalDate date);
 
     @Transactional
     @Modifying
-    @Query("DELETE FROM Vote v WHERE v.id=:id")
-    int delete(int id);
+    @Query("DELETE FROM Vote v WHERE v=:vote")
+    int deleteByVote(Vote vote);
 }

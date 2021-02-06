@@ -25,8 +25,8 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 public class RestaurantAdminController {
 
     public static final String ADMIN_RESTAURANTS_URL = "/api/admin/restaurants";
-    private final RestaurantRepository repository;
 
+    private final RestaurantRepository repository;
     private final UniqueNameValidator nameValidator;
 
     @InitBinder

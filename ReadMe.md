@@ -1,4 +1,4 @@
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/96772101b561468f800e827c8e358334)](https://www.codacy.com/gh/Javvernaut/votingsystem/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Javvernaut/votingsystem&amp;utm_campaign=Badge_Grade)  
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/96772101b561468f800e827c8e358334)](https://www.codacy.com/gh/Javvernaut/votingsystem/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Javvernaut/votingsystem&amp;utm_campaign=Badge_Grade) [![Build Status](https://travis-ci.com/Javvernaut/votingsystem.svg?branch=master)](https://travis-ci.com/Javvernaut/votingsystem)
 
 # TopJava Graduation Project
 ***
@@ -44,9 +44,10 @@ POST | /api/profile/register | Register new user
 Method | Resource | Description
 -------|----------|------------
 GET | /api/votes | Get all votes for current user
+GET | /api/votes/current | Get vote for current user 
 POST | /api/votes?restaurantId= | Create new vote
-PATCH | /api/votes/{id}?restaurant= | Update vote, if possible
-DELETE | /api/votes/{id} | Delete vote
+PATCH | /api/votes?restaurant= | Update vote, if possible
+DELETE | /api/votes | Delete vote
 GET | /api/profile | Get profile for current user
 PUT | /api/profile | Update profile for current user
 DELETE | /api/profile | Delete profile for current user
@@ -89,10 +90,8 @@ Method | Resource | Description
 GET | /api/admin/restaurants/{restaurantId}/menus/{menuId}/items | Get all menu items by menu
 GET | /api/admin/restaurants/{restaurantId}/menus/{menuId}/items/{id} | Get menu item by menu
 POST | /api/admin/restaurants/{restaurantId}/menus/{menuId}/items | Create menu item
-PUT | /api/admin/restaurants/{restaurantId}/menus/{menuId}/items/{id} | Update menu item
+PATCH | /api/admin/restaurants/{restaurantId}/menus/{menuId}/items/{id} | Update menu item
 DELETE | /api/admin/restaurants/{restaurantId}/menus/{menuId}/items/{id} | Delete menu item
-
-
 
 ## cURL samples
 
@@ -120,14 +119,17 @@ DELETE | /api/admin/restaurants/{restaurantId}/menus/{menuId}/items/{id} | Delet
 #### Get all votes
     curl -X GET  "http://localhost:8080/api/votes" 
     --basic --user al@mail.ru:alien
+#### Get current vote
+    curl -X GET  "http://localhost:8080/api/votes/current" 
+    --basic --user al@mail.ru:alien
 #### Create new vote
     curl -X POST --location "http://localhost:8080/api/votes?restaurantId=100005"
     --basic --user admin@gmail.com:admin
 #### Change vote
-    curl -X PATCH --location "http://localhost:8080/api/votes/100040?restaurantId=100004"
+    curl -X PATCH --location "http://localhost:8080/api/votes?restaurantId=100004"
     --basic --user admin@gmail.com:admin
 #### Delete vote
-    curl -X DELETE --location "http://localhost:8080/api/votes/100040"
+    curl -X DELETE --location "http://localhost:8080/api/votes"
     --basic --user admin@gmail.com:admin
 ***
 #### Get profile
@@ -227,18 +229,19 @@ DELETE | /api/admin/restaurants/{restaurantId}/menus/{menuId}/items/{id} | Delet
     curl -X GET --location "http://localhost:8080/api/admin/restaurants/100005/menus/100028/items/100020"
     --basic --user admin@gmail.com:admin
 #### Create menu item
-    curl -X POST --location "http://localhost:8080/api/admin/restaurants/100005/menus/100028/items"
+    curl -X POST --location "http://localhost:8080/api/admin/restaurants/100004/menus/100026/items"
     -H "Content-Type: application/json"
     -d "{
-          "id" : 100043,
-          "price" : 11
+          "dishId" : 100011,
+          "price" : 55
         }"
     --basic --user admin@gmail.com:admin
 #### Update menu item
-    curl -X PUT --location "http://localhost:8080/api/admin/restaurants/100005/menus/100028/items/100018"
+    curl -X PATCH --location "http://localhost:8080/api/admin/restaurants/100005/menus/100030/items/100056"
     -H "Content-Type: application/json"
     -d "{
-          "id" : 100018,
+          "id" : 100056,
+          "dishId" : 100018,
           "price" : 11
         }"
     --basic --user admin@gmail.com:admin
@@ -246,9 +249,3 @@ DELETE | /api/admin/restaurants/{restaurantId}/menus/{menuId}/items/{id} | Delet
     curl -X DELETE --location "http://localhost:8080/api/admin/restaurants/100005/menus/100028/items/100020"
     --basic --user admin@gmail.com:admin
 ***
-
-
-
-
-### Вопрос:
-VoteController - Чтобы собрать ответ из VoteTo и ItemTo без ModelMapper или MapStruct не обойтись?

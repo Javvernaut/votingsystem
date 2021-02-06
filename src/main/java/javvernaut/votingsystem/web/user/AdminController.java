@@ -21,7 +21,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @RequestMapping(value = AdminController.ADMIN_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 public class AdminController extends AbstractUserController {
-    static final String ADMIN_URL = "/api/admin/users";
+    public static final String ADMIN_URL = "/api/admin/users";
 
     @GetMapping
     public List<User> getAll() {

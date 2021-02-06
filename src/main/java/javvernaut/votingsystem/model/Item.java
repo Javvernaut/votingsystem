@@ -37,9 +37,6 @@ public class Item extends AbstractBaseEntity {
         this.price = price;
     }
 
-    public Item(Integer id, Integer price) {
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

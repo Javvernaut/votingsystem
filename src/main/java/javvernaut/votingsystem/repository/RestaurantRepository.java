@@ -1,7 +1,7 @@
 package javvernaut.votingsystem.repository;
 
 import javvernaut.votingsystem.model.Restaurant;
-import org.springframework.data.jpa.repository.EntityGraph;
+import javvernaut.votingsystem.to.RestaurantTo;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,29 +22,21 @@ public interface RestaurantRepository extends BaseRepository<Restaurant> {
     @Query("SELECT r FROM Restaurant r INNER JOIN r.menus m WHERE r.id=:id AND m.menuDate=:date")
     Optional<Restaurant> findByIdAndMenuDate(int id, LocalDate date);
 
-/*    @Query("SELECT new javvernaut.votingsystem.to.RestaurantTo(r.id, r.name, COUNT (v)) " +
+    @Query("SELECT new javvernaut.votingsystem.to.RestaurantTo(r.id, r.name, COUNT (v)) " +
             "FROM Restaurant r " +
             "LEFT JOIN r.votes v " +
             "INNER JOIN r.menus m " +
-            "WHERE m.date=:date " +
+            "WHERE m.menuDate=:date " +
             "GROUP BY r ORDER BY COUNT(v) DESC ")
-    List<RestaurantTo> findAllTosWithVotesByMenuDate(LocalDate date);*/
+    List<RestaurantTo> findAllTosWithVotesByMenuDate(LocalDate date);
 
-    @EntityGraph(attributePaths = {"votes"}, type = EntityGraph.EntityGraphType.LOAD)
-    @Query("SELECT r FROM Restaurant r INNER JOIN r.menus m WHERE m.menuDate=:date")
-    List<Restaurant> findAllTosWithVotesByMenuDate(LocalDate date);
-
-/*    @Query("SELECT new javvernaut.votingsystem.to.RestaurantTo(r.id, r.name, COUNT (v)) " +
+    @Query("SELECT new javvernaut.votingsystem.to.RestaurantTo(r.id, r.name, COUNT (v)) " +
             "FROM Restaurant r " +
             "LEFT JOIN r.votes v " +
             "INNER JOIN r.menus m " +
-            "WHERE r.id=:id AND m.date=:currentDate " +
+            "WHERE r.id=:id AND m.menuDate=:date " +
             "GROUP BY r")
-    Optional<RestaurantTo> findToByIdAndMenuDate(int id, LocalDate date);*/
-
-    @EntityGraph(attributePaths = {"votes"}, type = EntityGraph.EntityGraphType.LOAD)
-    @Query("SELECT r FROM Restaurant r INNER JOIN r.menus m WHERE r.id=:id AND m.menuDate=:date")
-    Optional<Restaurant> findWithVotesByIdAndMenuDate(int id, LocalDate date);
+    Optional<RestaurantTo> findToByIdAndMenuDate(int id, LocalDate date);
 
     List<Restaurant> findAllByOrderByName();
 

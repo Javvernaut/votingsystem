@@ -1,9 +1,9 @@
 package javvernaut.votingsystem.to;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
 
-@Value
+@Data
 @EqualsAndHashCode(callSuper = true)
 public class RestaurantTo extends BaseTo {
     String name;

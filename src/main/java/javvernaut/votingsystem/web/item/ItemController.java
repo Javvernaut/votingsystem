@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -32,8 +33,8 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @RequestMapping(value = ItemController.ITEMS_URL,
         produces = MediaType.APPLICATION_JSON_VALUE)
 public class ItemController {
-
     public static final String ITEMS_URL = "/api/admin/restaurants/{restaurantId}/menus/{menuId}/items";
+
     private final ItemRepository itemRepository;
     private final MenuRepository menuRepository;
     private final DishRepository dishRepository;
@@ -71,6 +72,7 @@ public class ItemController {
 
 
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
     @ResponseStatus(NO_CONTENT)
     public void updatePrice(
             @PathVariable int restaurantId,
@@ -93,6 +95,6 @@ public class ItemController {
                 itemRepository.findByIdAndMenuIdAndMenuRestaurantId(id, menuId, restaurantId),
                 "Item with id=" + id + " not found");
         checkDateIsAfterTheCurrent(item.getMenu().getMenuDate(), "Item id = " + id + " cannot be deleted.");
-        checkSingleModification(itemRepository.deleteByItem(item),"Item id=" + item.getId() + " missed");
+        checkSingleModification(itemRepository.deleteByItem(item), "Item id=" + item.getId() + " missed");
     }
 }

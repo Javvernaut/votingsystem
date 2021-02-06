@@ -23,7 +23,6 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @RequestMapping(value = UserController.PROFILE_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 public class UserController extends AbstractUserController {
-
     public static final String PROFILE_URL = "/api/profile";
 
     @GetMapping

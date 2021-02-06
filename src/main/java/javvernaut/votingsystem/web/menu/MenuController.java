@@ -25,8 +25,8 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @AllArgsConstructor
 @RequestMapping(value = MenuController.MENUS_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class MenuController {
-
     public static final String MENUS_URL = "/api/admin/restaurants/{restaurantId}/menus";
+
     private final MenuRepository menuRepository;
     private final RestaurantRepository restaurantRepository;
     private final DishRepository dishRepository;

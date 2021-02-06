@@ -27,8 +27,8 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @AllArgsConstructor
 @RequestMapping(DishController.DISHES_URL)
 public class DishController {
-
     public static final String DISHES_URL = "/api/admin/restaurants/{restaurantId}/dishes";
+
     private final DishRepository dishRepository;
     private final RestaurantRepository restaurantRepository;
     private final MenuRepository menuRepository;

@@ -74,7 +74,7 @@ VALUES (global_seq.nextval, 100022, 100006, 333),
        (global_seq.nextval, 100030, 100018, 22),
        (global_seq.nextval, 100030, 100019, 77);
 
-INSERT INTO votes(id, user_id, restaurant_id, date)
+INSERT INTO votes(id, user_id, restaurant_id, vote_date)
 VALUES (global_seq.nextval, 100000, 100004, '2020-12-10'),
        (global_seq.nextval, 100000, 100003, '2020-12-11'),
        (global_seq.nextval, 100000, 100004, '2020-12-12'),

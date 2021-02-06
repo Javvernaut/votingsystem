@@ -2,7 +2,6 @@ package javvernaut.votingsystem.web.vote;
 
 import javvernaut.votingsystem.model.Restaurant;
 import javvernaut.votingsystem.model.Vote;
-import javvernaut.votingsystem.repository.ItemRepository;
 import javvernaut.votingsystem.repository.RestaurantRepository;
 import javvernaut.votingsystem.repository.UserRepository;
 import javvernaut.votingsystem.repository.VoteRepository;
@@ -29,12 +28,11 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @AllArgsConstructor
 @RequestMapping(VoteController.VOTES_URL)
 public class VoteController {
-
     public static final String VOTES_URL = "/api/votes";
+
     private final VoteRepository voteRepository;
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
-    private final ItemRepository itemRepository;
 
     @GetMapping
     public List<Vote> getAll(@AuthenticationPrincipal AuthorizedUser authorizedUser) {
@@ -42,10 +40,16 @@ public class VoteController {
         return voteRepository.findAllByUserId(authorizedUser.getId());
     }
 
+    @GetMapping("/current")
+    public ResponseEntity<Vote> get(@AuthenticationPrincipal AuthorizedUser authorizedUser) {
+        log.info("get current vote");
+        return ResponseEntity.of(voteRepository.findByUserIdAndDate(authorizedUser.getId(), current_date));
+    }
+
     @PostMapping
     public ResponseEntity<Vote> createWithLocation(@AuthenticationPrincipal AuthorizedUser authorizedUser,
                                                    @RequestParam int restaurantId) {
-        log.info("create new vote");
+        log.info("create vote to restaurant id={}", restaurantId);
         Restaurant restaurant = checkNotFoundWithId(restaurantRepository.findByIdAndMenuDate(restaurantId, current_date),
                 "Restaurant id=" + restaurantId + " not present menu today");
         Vote created = voteRepository.save(new Vote(null, userRepository.getOne(authorizedUser.getId()), restaurant, current_date));
@@ -55,14 +59,13 @@ public class VoteController {
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping()
     @Transactional
     @ResponseStatus(NO_CONTENT)
-    public void update(@AuthenticationPrincipal AuthorizedUser authorizedUser, @PathVariable int id,
-                       @RequestParam int restaurantId) {
-        log.info("update vote to restaurant id={}", id);
-        Vote existed = checkNotFoundWithId(voteRepository.findByIdAndUserIdAndDate(id, authorizedUser.getId(), current_date), id);
-        if (!current_time.isBefore(votes_deadline)) {
+    public void update(@AuthenticationPrincipal AuthorizedUser authorizedUser, @RequestParam int restaurantId) {
+        log.info("update vote to restaurant id={}", restaurantId);
+        Vote existed = checkVoteNotFound(authorizedUser);
+        if (!current_time.isBefore(votes_deadline) || existed.getRestaurant().id() == restaurantId) {
             throw new IllegalRequestDataException("Vote cannot be changed");
         }
         Restaurant restaurant = checkNotFoundWithId(restaurantRepository.findByIdAndMenuDate(restaurantId, current_date),
@@ -70,14 +73,19 @@ public class VoteController {
         existed.setRestaurant(restaurant);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping()
     @ResponseStatus(NO_CONTENT)
-    public void delete(@AuthenticationPrincipal AuthorizedUser authorizedUser, @PathVariable int id) {
-        log.info("delete vote id={}", id);
-        Vote existed = checkNotFoundWithId(voteRepository.findByIdAndUserIdAndDate(id, authorizedUser.getId(), current_date), id);
-        if (existed.getDate().isBefore(current_date) || !current_time.isBefore(votes_deadline)) {
+    public void delete(@AuthenticationPrincipal AuthorizedUser authorizedUser) {
+        log.info("delete vote");
+        Vote existed = checkVoteNotFound(authorizedUser);
+        if (existed.getVoteDate().isBefore(current_date) || !current_time.isBefore(votes_deadline)) {
             throw new IllegalRequestDataException("Vote cannot be deleted");
         }
-        checkSingleModification(voteRepository.delete(id), "Vote id=" + id + ", user id=" + authorizedUser.getId() + " missed");
+        checkSingleModification(voteRepository.deleteByVote(existed), "Vote id=" + existed.getId() + " missed");
+    }
+
+    private Vote checkVoteNotFound(AuthorizedUser authorizedUser) {
+        return checkNotFoundWithId(voteRepository.findByUserIdAndDate(authorizedUser.getId(), current_date),
+                "Vote not found");
     }
 }
