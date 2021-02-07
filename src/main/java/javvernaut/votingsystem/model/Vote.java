@@ -22,7 +22,7 @@ public class Vote extends AbstractBaseEntity {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    @Column(name = "vote_date", nullable = false, columnDefinition = "date")
+    @Column(name = "vote_date", nullable = false, columnDefinition = "date default now()")
     @NotNull
     private LocalDate voteDate;
 

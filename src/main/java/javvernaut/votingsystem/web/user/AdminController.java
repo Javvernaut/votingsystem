@@ -2,6 +2,9 @@ package javvernaut.votingsystem.web.user;
 
 import javvernaut.votingsystem.model.User;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +23,12 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @RestController
 @RequestMapping(value = AdminController.ADMIN_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
+@CacheConfig(cacheNames = "users")
 public class AdminController extends AbstractUserController {
     public static final String ADMIN_URL = "/api/admin/users";
 
     @GetMapping
+    @Cacheable
     public List<User> getAll() {
         log.info("get all");
         return repository.findAll(Sort.by(Sort.Direction.ASC, "name", "email"));
@@ -41,6 +46,7 @@ public class AdminController extends AbstractUserController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @CacheEvict(allEntries = true)
     public ResponseEntity<User> createWithLocation(@Valid @RequestBody User user) {
         log.info("create {}", user);
         checkNew(user);
@@ -55,12 +61,14 @@ public class AdminController extends AbstractUserController {
     @Override
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void delete(@PathVariable int id) {
         super.delete(id);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void update(@Valid @RequestBody User user, @PathVariable int id) throws BindException {
         validateBeforeUpdate(user, id);
         log.info("update {}", user);
@@ -70,6 +78,7 @@ public class AdminController extends AbstractUserController {
     @PatchMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
     @Transactional
+    @CacheEvict(allEntries = true)
     public void enable(@PathVariable int id, @RequestParam boolean enabled) {
         User user = repository.getExisted(id);
         user.setEnabled(enabled);

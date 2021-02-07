@@ -4,6 +4,9 @@ import javvernaut.votingsystem.model.Restaurant;
 import javvernaut.votingsystem.repository.RestaurantRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
@@ -22,6 +25,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @Slf4j
 @AllArgsConstructor
 @RequestMapping(value = RestaurantAdminController.ADMIN_RESTAURANTS_URL, produces = MediaType.APPLICATION_JSON_VALUE)
+@CacheConfig(cacheNames = "restaurants")
 public class RestaurantAdminController {
 
     public static final String ADMIN_RESTAURANTS_URL = "/api/admin/restaurants";
@@ -30,11 +34,12 @@ public class RestaurantAdminController {
     private final UniqueNameValidator nameValidator;
 
     @InitBinder
-    private void initBinder(WebDataBinder binder) {
+    protected void initBinder(WebDataBinder binder) {
         binder.addValidators(nameValidator);
     }
 
     @GetMapping
+    @Cacheable
     public List<Restaurant> getAll() {
         log.info("get all");
         return repository.findAllByOrderByName();
@@ -48,6 +53,7 @@ public class RestaurantAdminController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
+    @CacheEvict(allEntries = true)
     public ResponseEntity<Restaurant> createWithLocation(@Valid @RequestBody Restaurant restaurant) {
         log.info("create {}", restaurant);
         checkNew(restaurant);
@@ -60,6 +66,7 @@ public class RestaurantAdminController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void update(@Valid @RequestBody Restaurant restaurant, @PathVariable int id) {
         log.info("update {}", restaurant);
         assureIdConsistent(restaurant, id);
@@ -70,6 +77,7 @@ public class RestaurantAdminController {
     //TODO check votes
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void delete(@PathVariable int id) {
         log.info("delete {}", id);
         checkSingleModification(repository.delete(id), "Restaurant id=" + id + " missed");

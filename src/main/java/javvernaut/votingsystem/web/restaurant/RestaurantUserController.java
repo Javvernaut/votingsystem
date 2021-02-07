@@ -9,6 +9,7 @@ import javvernaut.votingsystem.to.RestaurantTo;
 import javvernaut.votingsystem.util.ItemUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,7 @@ public class RestaurantUserController {
     private final MenuRepository menuRepository;
 
     @GetMapping
+    @Cacheable(value = "restaurantsWithVotes")
     public List<RestaurantTo> getAllWithVotesCountForCurrentDay() {
         log.info("get all restaurants that presented menu for current date");
         return restaurantRepository.findAllTosWithVotesByMenuDate(current_date);

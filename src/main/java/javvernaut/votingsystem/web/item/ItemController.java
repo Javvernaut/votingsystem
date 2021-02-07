@@ -11,6 +11,9 @@ import javvernaut.votingsystem.to.ItemTo;
 import javvernaut.votingsystem.util.ItemUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @AllArgsConstructor
 @RequestMapping(value = ItemController.ITEMS_URL,
         produces = MediaType.APPLICATION_JSON_VALUE)
+@CacheConfig(cacheNames = "items")
 public class ItemController {
     public static final String ITEMS_URL = "/api/admin/restaurants/{restaurantId}/menus/{menuId}/items";
 
@@ -42,6 +46,7 @@ public class ItemController {
 
 
     @GetMapping
+    @Cacheable
     public List<ItemTo> getAll(@PathVariable int restaurantId, @PathVariable int menuId) {
         log.info("get all");
         return ItemUtil.getTos(itemRepository.findAllByMenuIdAndMenuRestaurantId(menuId, restaurantId));
@@ -55,6 +60,7 @@ public class ItemController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @CacheEvict(allEntries = true)
     public ResponseEntity<ItemTo> createWithLocation(
             @PathVariable int restaurantId,
             @PathVariable int menuId,
@@ -74,6 +80,7 @@ public class ItemController {
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @ResponseStatus(NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void updatePrice(
             @PathVariable int restaurantId,
             @PathVariable int menuId,
@@ -89,6 +96,7 @@ public class ItemController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void delete(@PathVariable int restaurantId, @PathVariable int menuId, @PathVariable int id) {
         log.info("delete item {} from menu {}", id, menuId);
         Item item = checkNotFoundWithId(

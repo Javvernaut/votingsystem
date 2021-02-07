@@ -6,6 +6,9 @@ import javvernaut.votingsystem.repository.MenuRepository;
 import javvernaut.votingsystem.repository.RestaurantRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @Slf4j
 @AllArgsConstructor
 @RequestMapping(value = MenuController.MENUS_URL, produces = MediaType.APPLICATION_JSON_VALUE)
+@CacheConfig(cacheNames = "menus")
 public class MenuController {
     public static final String MENUS_URL = "/api/admin/restaurants/{restaurantId}/menus";
 
@@ -32,6 +36,7 @@ public class MenuController {
     private final DishRepository dishRepository;
 
     @GetMapping
+    @Cacheable
     public List<Menu> getAll(@PathVariable int restaurantId) {
         log.info("get all");
         return menuRepository.findAllByRestaurantId(restaurantId);
@@ -44,7 +49,7 @@ public class MenuController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
+    @CacheEvict(allEntries = true)
     public ResponseEntity<Menu> createWithLocation(@PathVariable int restaurantId, @Valid @RequestBody Menu menu) {
         log.info("create {}", menu);
         checkNew(menu);
@@ -60,6 +65,7 @@ public class MenuController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
     @Transactional
+    @CacheEvict(allEntries = true)
     public void update(@PathVariable int restaurantId, @PathVariable int id, @Valid @RequestBody Menu menu) {
         log.info("change date of menu={}", id);
         assureIdConsistent(menu, id);
@@ -74,6 +80,7 @@ public class MenuController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(NO_CONTENT)
     @Transactional
+    @CacheEvict(allEntries = true)
     public void delete(@PathVariable int restaurantId, @PathVariable int id) {
         log.info("delete {}", id);
         Menu menu = checkNotFoundWithId(menuRepository.findByIdAndRestaurantId(id, restaurantId), id);

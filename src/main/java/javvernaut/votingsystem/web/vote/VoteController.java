@@ -9,6 +9,9 @@ import javvernaut.votingsystem.util.exception.IllegalRequestDataException;
 import javvernaut.votingsystem.util.security.AuthorizedUser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @Slf4j
 @AllArgsConstructor
 @RequestMapping(VoteController.VOTES_URL)
+@CacheConfig(cacheNames = "votes")
 public class VoteController {
     public static final String VOTES_URL = "/api/votes";
 
@@ -35,6 +39,7 @@ public class VoteController {
     private final RestaurantRepository restaurantRepository;
 
     @GetMapping
+    @Cacheable
     public List<Vote> getAll(@AuthenticationPrincipal AuthorizedUser authorizedUser) {
         log.info("get all votes for user id={}", authorizedUser.getId());
         return voteRepository.findAllByUserId(authorizedUser.getId());
@@ -47,6 +52,7 @@ public class VoteController {
     }
 
     @PostMapping
+    @CacheEvict(allEntries = true)
     public ResponseEntity<Vote> createWithLocation(@AuthenticationPrincipal AuthorizedUser authorizedUser,
                                                    @RequestParam int restaurantId) {
         log.info("create vote to restaurant id={}", restaurantId);
@@ -62,6 +68,7 @@ public class VoteController {
     @PatchMapping()
     @Transactional
     @ResponseStatus(NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void update(@AuthenticationPrincipal AuthorizedUser authorizedUser, @RequestParam int restaurantId) {
         log.info("update vote to restaurant id={}", restaurantId);
         Vote existed = checkVoteNotFound(authorizedUser);
@@ -75,6 +82,7 @@ public class VoteController {
 
     @DeleteMapping()
     @ResponseStatus(NO_CONTENT)
+    @CacheEvict(allEntries = true)
     public void delete(@AuthenticationPrincipal AuthorizedUser authorizedUser) {
         log.info("delete vote");
         Vote existed = checkVoteNotFound(authorizedUser);

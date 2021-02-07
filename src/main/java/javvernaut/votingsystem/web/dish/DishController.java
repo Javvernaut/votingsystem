@@ -8,6 +8,9 @@ import javvernaut.votingsystem.repository.RestaurantRepository;
 import javvernaut.votingsystem.util.exception.ForbiddenException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @Slf4j
 @AllArgsConstructor
 @RequestMapping(DishController.DISHES_URL)
+@CacheConfig(cacheNames = "dishes")
 public class DishController {
     public static final String DISHES_URL = "/api/admin/restaurants/{restaurantId}/dishes";
 
@@ -34,6 +38,7 @@ public class DishController {
     private final MenuRepository menuRepository;
 
     @GetMapping()
+    @Cacheable
     public List<Dish> getAll(@PathVariable int restaurantId) {
         log.info("get all");
         return dishRepository.findAllByRestaurantId(restaurantId);
@@ -46,6 +51,7 @@ public class DishController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @CacheEvict(allEntries = true)
     public ResponseEntity<Dish> createWithLocation(@PathVariable int restaurantId, @Valid @RequestBody Dish dish) {
         log.info("create {}", dish);
         checkNew(dish);
@@ -61,6 +67,7 @@ public class DishController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
     @Transactional
+    @CacheEvict(allEntries = true)
     public void update(@PathVariable int restaurantId, @PathVariable int id, @Valid @RequestBody Dish dish) {
         log.info("update {}", dish);
         assureIdConsistent(dish, id);
@@ -72,6 +79,7 @@ public class DishController {
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
     @Transactional
+    @CacheEvict(allEntries = true)
     public void delete(@PathVariable int restaurantId, @PathVariable int id) {
         log.info("delete {}", id);
         Dish dish = checkNotFoundWithIdAndRestaurantId(id, restaurantId);
